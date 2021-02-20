@@ -47,7 +47,6 @@
 #define INSTA_POST "POST / HTTP/1.1\r\nHost: instagram.com\r\n\r\n"
 
 
-
 #define SITCN_FLDR "./certs/sitcn/"
 #define SITCN_CHAIN SITCN_FLDR "sitcn-chain.pem"
 #define SITCN_ROOT SITCN_FLDR "sitcn-root.pem"
@@ -112,7 +111,7 @@ typedef enum {
 
 static int cert_show_details(const pub_key_alg_t pubEncAlg,
 	const char *certPath);
-static int cert_manual_verify(WOLFSSL_CTX *ctx, const char *caCert,
+static int cert_manual_verify(const char *caCert,
 	const char *vrfCert);
 
 static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *certFldr,
@@ -156,9 +155,9 @@ int main(int argc, char** argv)
 	int ret;
 	char input[MAX_INPUT];
 
-	WOLFSSL_CTX *ctx;
 	WOLFSSL_X509 *cert;
 	WOLFSSL *ssl;
+	WOLFSSL_CTX *ctx;
 
 	/* Start */
 	if (ret = wolfSSL_Init() != WOLFSSL_SUCCESS)
@@ -178,15 +177,16 @@ int main(int argc, char** argv)
 
 	/* Can modify program to be like arg parser but thats for later. */
 
-	if (_IS("1")) {	// 1. View Youtube cert publickey info.
+	if (_IS("1"))	// 1. View Youtube cert publickey info.
 		(void)cert_show_details(ENC_ECC, YT_CHAIN);
-	}
 	if (_IS("2"))	//2. View Reddit cert publickey info.
 		cert_show_details(ENC_RSA, REDDIT_ROOT);
+
 	if (_IS("3"))	//3. Youtube certs verification.
-		if ((ret = cert_manual_verify(ctx, YT_ROOT, YT_MID))) fprintf(stdout, "Success %d\n", ret);
+		if ((ret = cert_manual_verify(ctx, YT_ROOT, YT_MID))) fprintf(stdout, "Return Code: %d\n", ret);
 	if (_IS("4"))	//4. Reddit cert verifications.
-		if ((ret = cert_manual_verify(ctx, REDDIT_MID, REDDIT_SERV))) fprintf(stdout, "Success %d\n", ret);
+		if ((ret = cert_manual_verify(ctx, REDDIT_MID, REDDIT_SERV))) fprintf(stdout, "Return Code: %d\n", ret);
+
 	if (_IS("5"))	//5. Write Youtube GET.
 		if ((ret = server_interact(ctx, YT_ROOT, 0, YT_GET, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
 	if (_IS("6"))	//6. Write Reddit GET.
@@ -195,6 +195,8 @@ int main(int argc, char** argv)
 		(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_GET, INSTA_HOST, HTTPS_PORT);
 	if (_IS("8"))	//8. Write Slack GET.
 		(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_GET, SLACK_HOST, HTTPS_PORT);
+
+
 	if (_IS("9"))	//9. Write Youtube POST.
 		if ((ret = server_interact(ctx, 0, YT_FLDR, YT_POST, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
 	if (_IS("10"))//10. Write Reddit POST.
@@ -306,7 +308,7 @@ finish:
 }
 
 
-static int cert_manual_verify(WOLFSSL_CTX *ctx, const char *caCert,
+static int cert_manual_verify(const char *caCert,
 	const char *vrfCert) {
 
 	// Verify locations method of verification
@@ -342,6 +344,12 @@ finish:
 	return suc;
 }
 
+static int test_interest(WOLFSSL_CTX *ctx) {
+	int suc;
+
+	return 0;
+}
+
 static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *certFldr,
 	const char *sendMsg, const char *servHostName, const int portNo) {
 
@@ -371,11 +379,11 @@ static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *c
 	if (connect(sockfd, (struct sockaddr*) &servAddr, sizeof(servAddr)) == -1)
 		eprintf("Failed to connect to socket\n", socket_cleanup)
 
-		//tcp_connect(&sockfd, host, port, dtlsUDP, dtlsSCTP, ssl);
+	//tcp_connect(&sockfd, host, port, dtlsUDP, dtlsSCTP, ssl);
 
-		// Load and verify the certs 
-		if ((ret = wolfSSL_CTX_load_verify_locations(ctx, certPath, certFldr)) != SSL_SUCCESS)
-			eprintf("Failed to load cert file.\n", finish);
+	// Load and verify the certs
+	if ((ret = wolfSSL_CTX_load_verify_locations(ctx, certPath, certFldr)) != SSL_SUCCESS)
+		eprintf("Failed to load cert file.\n", finish);
 
 	if ((ssl = wolfSSL_new(ctx)) == NULL)
 		eprintf("Failed to load SSL struct.\n", ssl_cleanup)
@@ -411,6 +419,7 @@ socket_cleanup:
 finish:
 	return suc;
 }
+
 
 /**
  * Converts hostname to ip address.
@@ -537,7 +546,4 @@ static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str
 }
 
 
-static int test_interest(WOLFSSL_CTX *ctx) {
 
-	return 0;
-}
