@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <time.h>
 
-#include <wolfssl/options.h>
+
 
 
 #include <wolfssl/wolfcrypt/settings.h>
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 	if (ret = wolfSSL_Init() != WOLFSSL_SUCCESS)
 		eprintf("Failed to init wolfSSL.\n", cleanup)
 
-		// Create context 
+	// Create context 
 	if ((ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL)
 		eprintf("Failed to create WolfSSL context.\n", ctx_cleanup)
 
