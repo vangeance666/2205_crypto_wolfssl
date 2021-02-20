@@ -4,6 +4,9 @@
 #include <windows.h>
 #include <time.h>
 
+#include <wolfssl/options.h>
+
+
 #include <wolfssl/wolfcrypt/settings.h>
 
 #include <wolfssl/wolfcrypt/rsa.h>
@@ -122,6 +125,9 @@ static int ClientRead(WOLFSSL *ssl, char *reply, int replyLen, int mustRead,
 static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str,
 	int exitWithRet);
 
+// Temp function to experiment with how WOLFSSL works before integrating
+static int test_interest(WOLFSSL_CTX *ctx);
+
 #define _IS(X) strcmp(input, X"\n") == 0
 #define eprintf(M, G) {fprintf(stderr, "[Error][%s] %s ", __func__, M); goto G;}
 
@@ -170,6 +176,8 @@ int main(int argc, char** argv)
 
 	fgets(input, MAX_INPUT, stdin);
 
+	/* Can modify program to be like arg parser but thats for later. */
+
 	if (_IS("1")) {	// 1. View Youtube cert publickey info.
 		(void)cert_show_details(ENC_ECC, YT_CHAIN);
 	}
@@ -195,7 +203,10 @@ int main(int argc, char** argv)
 		(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_POST, INSTA_HOST, HTTPS_PORT);
 	if (_IS("12"))	//12. Write Slack POST.*/
 		(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_POST, SLACK_HOST, HTTPS_PORT);
-	printf("Invalid choice, please enter again.\n");
+	if (_IS("13"))
+		(void)test_interest;
+
+	//printf("Invalid choice, please enter again.\n");
 
 	/*
 	if (!show_cert_details(cert, ENC_RSA))
@@ -334,7 +345,7 @@ finish:
 static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *certFldr,
 	const char *sendMsg, const char *servHostName, const int portNo) {
 
-	printf("%s \n", sendMsg);
+	printf("SendMsg:\n%s \n", sendMsg);
 
 	struct sockaddr_in servAddr;
 	SOCKET_T sockfd; WOLFSSL *ssl;
@@ -401,6 +412,14 @@ finish:
 	return suc;
 }
 
+/**
+ * Converts hostname to ip address.
+ * For e.g www.google.com to 172.217.194.102
+ * Similar to how nslookup works
+ * @param  inName Pointer of hostname
+ * @param  outIp  Buffer to store IP Address
+ * @return        1 if success else 0
+ */
 static int host_to_ip(const char *inName, char *outIp) {
 
 	WSADATA wsaData;
@@ -432,8 +451,8 @@ finish:
 }
 
 
-// WolfSSL's helper function to read server response
-static int ClientRead(WOLFSSL* ssl, char* reply, int replyLen, int mustRead,
+/** WolfSSL's helper function to read server response */
+static int ClientRead(WOLFSSL *ssl, char *reply, int replyLen, int mustRead,
 	const char* str, int exitWithRet) {
 
 	int ret, err;
@@ -483,8 +502,8 @@ static int ClientRead(WOLFSSL* ssl, char* reply, int replyLen, int mustRead,
 
 	return err;
 }
-//
-// Helper function to write Message with GET/POST into SSL object
+
+/** Helper function to write Message with GET/POST into SSL object */
 static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str)
 {
 	printf("Inside ClientWrite\n");
@@ -515,4 +534,10 @@ static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str
 			wolfSSL_ERR_error_string(err, buffer));
 	}
 	return err;
+}
+
+
+static int test_interest(WOLFSSL_CTX *ctx) {
+
+	return 0;
 }
