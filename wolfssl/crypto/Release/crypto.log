@@ -1,34 +1,58 @@
 ﻿  main.c
 CL : warning : For timing resistance / side-channel attack prevention consider using harden options
-main.c(187): warning C4133: 'function': incompatible types - from 'WOLFSSL_CTX *' to 'const char *'
-main.c(187): warning C4020: 'cert_manual_verify': too many actual parameters
-main.c(189): warning C4133: 'function': incompatible types - from 'WOLFSSL_CTX *' to 'const char *'
-main.c(189): warning C4020: 'cert_manual_verify': too many actual parameters
-main.c(227): warning C4102: 'finish': unreferenced label
-main.c(160): warning C4101: 'ssl': unreferenced local variable
-main.c(159): warning C4101: 'cert': unreferenced local variable
-main.c(265): warning C4013: 'wc_ecc_init' undefined; assuming extern returning int
-main.c(266): warning C4013: 'wc_EccPublicKeyDecode' undefined; assuming extern returning int
-main.c(289): warning C4018: '<': signed/unsigned mismatch
-main.c(302): warning C4013: 'wc_ecc_free' undefined; assuming extern returning int
-main.c(303): warning C4102: 'rsa_key_cleanup': unreferenced label
-main.c(345): warning C4102: 'finish': unreferenced label
-main.c(415): warning C4013: 'close' undefined; assuming extern returning int
-main.c(374): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
-main.c(437): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-main.c(449): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-main.c(442): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(70): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(80): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(66): warning C4101: 'i': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(14): warning C4013: 'wc_ecc_init' undefined; assuming extern returning int
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(15): warning C4013: 'wc_EccPublicKeyDecode' undefined; assuming extern returning int
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(33): warning C4102: 'clean': unreferenced label
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(69): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(76): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'i': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'suc': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'sigType': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'ret': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(122): warning C4102: 'clean_all': unreferenced label
+main.c(210): warning C4102: 'finish': unreferenced label
+main.c(143): warning C4101: 'input': unreferenced local variable
+main.c(146): warning C4101: 'ssl': unreferenced local variable
+main.c(145): warning C4101: 'cert': unreferenced local variable
+main.c(280): warning C4018: '<': signed/unsigned mismatch
+main.c(314): warning C4013: 'wc_ecc_free' undefined; assuming extern returning int
+main.c(315): warning C4102: 'rsa_key_cleanup': unreferenced label
+main.c(239): warning C4101: 'altName': unreferenced local variable
+main.c(419): warning C4102: 'finish': unreferenced label
+main.c(435): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+main.c(446): warning C4090: 'function': different 'const' qualifiers
+main.c(440): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
   C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238): note: see declaration of 'gethostbyname'
-main.c(443): warning C4474: 'fprintf' : too many arguments passed for format string
-  main.c(443): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-main.c(449): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+main.c(447): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
+main.c(432): warning C4101: 'useLookup': unreferenced local variable
+main.c(462): warning C4047: 'function': 'word16' differs in levels of indirection from 'word16 *'
+main.c(462): warning C4024: 'build_addr': different types for formal and actual parameter 3
+main.c(464): warning C4047: '=': 'SOCKET_T *' differs in levels of indirection from 'SOCKET'
+main.c(573): warning C4013: 'close' undefined; assuming extern returning int
+main.c(534): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
+main.c(496): warning C4101: 'suc': unreferenced local variable
+main.c(635): warning C4020: 'ClientWrite': too many actual parameters
+main.c(605): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
+main.c(670): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+main.c(682): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(675): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238): note: see declaration of 'gethostbyname'
+main.c(676): warning C4474: 'fprintf' : too many arguments passed for format string
+  main.c(676): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+main.c(682): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
   C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1868): note: see declaration of 'inet_ntoa'
-main.c(513): warning C4029: declared formal parameter list different from definition
   Generating code
-  1 of 952 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  3 of 925 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.exe
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.pdb (Full PDB)

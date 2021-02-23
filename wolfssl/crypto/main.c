@@ -5,8 +5,6 @@
 #include <time.h>
 
 
-
-
 #include <wolfssl/wolfcrypt/settings.h>
 
 #include <wolfssl/wolfcrypt/rsa.h>
@@ -18,19 +16,11 @@
 #include <wolfssl/openssl/rsa.h>
 #include <wolfssl/openssl/x509v3.h>
 
-#define MAX_INPUT 10
-#define MAX_NON_BLOCK_SEC   60
+// Sequence matters
+#include "globals.h"
+#include "common.h"
+#include "certfields.h"
 
-#define CERT_DET_LEN 2000
-#define BUFF_SIZE 4096
-#define IP_BUFF_SIZE 100
-
-#define RESPONSE_SIZE 15001
-
-//Youtube currently is ECC
-//Xsite currently is RSA
-
-#define HTTPS_PORT 443
 
 #define SIT_FLDR "./certs/sit/"
 #define SIT_CHAIN SIT_FLDR "singaporetech-chain.pem"
@@ -93,7 +83,7 @@
 #define YT_MID YT_FLDR "youtube-mid.pem"
 #define YT_SERV YT_FLDR "youtube-server.pem"
 #define YT_CHAIN  YT_FLDR "youtube-chain.pem"
-#define YT_GET "GET / HTTP/1.1\r\nHost: youtube.com\r\n\r\n"
+#define YT_GET "GET / HTTP/1.1\r\nHost: www.youtube.com\r\n\r\n"
 #define YT_POST "POST / HTTP/1.1\r\nHost: youtube.com\r\n\r\n"
 
 //typedef enum {
@@ -103,32 +93,28 @@
 //	SITE_SKYPE
 //} site_mode_t;
 
-typedef enum {
-	ENC_RSA = 1,
-	ENC_ECC
-} pub_key_alg_t;
+static int myVerifyAction = VERIFY_OVERRIDE_ERROR;
 
+typedef struct sockaddr_in  SOCKADDR_IN_T;
 
-static int cert_show_details(const pub_key_alg_t pubEncAlg,
+static void print_peer_details(WOLFSSL *ssl);
+static int cert_show_details(const pub_key_enc_t pubEncAlg,
 	const char *certPath);
+static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX* store);
 static int cert_manual_verify(const char *caCert,
 	const char *vrfCert);
-
+static int build_addr(SOCKADDR_IN_T *addr, const char *peer, word16 port);
+static int tcp_connect(SOCKET_T *sockfd, const char *ip, word16 *port, WOLFSSL *ssl);
+static int test_interact(WOLFSSL_CTX *ctx, const char *host, VRF_ACTION_T verifyAction);
 static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *certFldr,
 	const char *sendMsg, const char *servHostName, const int portNo);
-
 static int host_to_ip(const char *inName, char *outIp);
-
 static int ClientRead(WOLFSSL *ssl, char *reply, int replyLen, int mustRead,
 	const char* str, int exitWithRet);
-static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str,
-	int exitWithRet);
+static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str);
+//
 
-// Temp function to experiment with how WOLFSSL works before integrating
-static int test_interest(WOLFSSL_CTX *ctx);
 
-#define _IS(X) strcmp(input, X"\n") == 0
-#define eprintf(M, G) {fprintf(stderr, "[Error][%s] %s ", __func__, M); goto G;}
 
 void print_help() {
 	printf("Please select the following choices: \n");
@@ -152,6 +138,7 @@ void print_help() {
 
 int main(int argc, char** argv)
 {
+
 	int ret;
 	char input[MAX_INPUT];
 
@@ -161,61 +148,59 @@ int main(int argc, char** argv)
 
 	/* Start */
 	if (ret = wolfSSL_Init() != WOLFSSL_SUCCESS)
-		eprintf("Failed to init wolfSSL.\n", cleanup)
+		eprintf("Failed to init wolfSSL.\n", cleanup);
 
-	// Create context 
+		// Create context 
 	if ((ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL)
-		eprintf("Failed to create WolfSSL context.\n", ctx_cleanup)
-
-	print_help();
-	int end = 0;
-	
-	printf("\n\n");
-	printf("Input ur choice: ");
-
-	fgets(input, MAX_INPUT, stdin);
-
-	/* Can modify program to be like arg parser but thats for later. */
-
-	if (_IS("1"))	// 1. View Youtube cert publickey info.
-		(void)cert_show_details(ENC_ECC, YT_CHAIN);
-	if (_IS("2"))	//2. View Reddit cert publickey info.
-		cert_show_details(ENC_RSA, REDDIT_ROOT);
-
-	if (_IS("3"))	//3. Youtube certs verification.
-		if ((ret = cert_manual_verify(ctx, YT_ROOT, YT_MID))) fprintf(stdout, "Return Code: %d\n", ret);
-	if (_IS("4"))	//4. Reddit cert verifications.
-		if ((ret = cert_manual_verify(ctx, REDDIT_MID, REDDIT_SERV))) fprintf(stdout, "Return Code: %d\n", ret);
-
-	if (_IS("5"))	//5. Write Youtube GET.
-		if ((ret = server_interact(ctx, YT_ROOT, 0, YT_GET, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
-	if (_IS("6"))	//6. Write Reddit GET.
-		if ((ret = server_interact(ctx, 0, REDDIT_FLDR, REDDIT_GET, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
-	if (_IS("7"))	//7. Write Instagram GET.
-		(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_GET, INSTA_HOST, HTTPS_PORT);
-	if (_IS("8"))	//8. Write Slack GET.
-		(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_GET, SLACK_HOST, HTTPS_PORT);
+		eprintf("Failed to create WolfSSL context.\n", ctx_cleanup);
 
 
-	if (_IS("9"))	//9. Write Youtube POST.
-		if ((ret = server_interact(ctx, 0, YT_FLDR, YT_POST, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
-	if (_IS("10"))//10. Write Reddit POST.
-		if ((ret = server_interact(ctx, 0, REDDIT_FLDR, REDDIT_POST, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
-	if (_IS("11"))	//11. Write Instagram POST.
-		(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_POST, INSTA_HOST, HTTPS_PORT);
-	if (_IS("12"))	//12. Write Slack POST.*/
-		(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_POST, SLACK_HOST, HTTPS_PORT);
-	if (_IS("13"))
-		(void)test_interest;
 
-	//printf("Invalid choice, please enter again.\n");
+	test_interact(ctx, "www.youtube.com", VERIFY_OVERRIDE_DATE_ERR);
+	//cert_show_details(ENC_RSA, YT_ROOT);
 
-	/*
-	if (!show_cert_details(cert, ENC_RSA))
-	fprintf(stderr, "[Error] Cant print cert details .\n");
-	*/
 
-	//server_interact(ctx, 0, REDDIT_FLDR, REDDIT_GET, "reddit.com", HTTPS_PORT);
+	//print_help();
+	//int end = 0;
+	//
+	//printf("\n\n");
+	//printf("Input ur choice: ");
+
+	//fgets(input, MAX_INPUT, stdin);
+
+	///* Can modify program to be like arg parser but thats for later. */
+
+	//if (_IS("1"))	// 1. View Youtube cert publickey info.
+	//	cert_show_details(ENC_RSA, YT_ROOT);
+	//if (_IS("2"))	//2. View Reddit cert publickey info.
+	//	cert_show_details(ENC_RSA, REDDIT_ROOT);
+
+	//if (_IS("3"))	//3. Youtube certs verification.
+	//	if ((ret = cert_manual_verify(ctx, YT_ROOT, YT_MID))) fprintf(stdout, "Return Code: %d\n", ret);
+	//if (_IS("4"))	//4. Reddit cert verifications.
+	//	if ((ret = cert_manual_verify(ctx, REDDIT_MID, REDDIT_SERV))) fprintf(stdout, "Return Code: %d\n", ret);
+
+	//if (_IS("5"))	//5. Write Youtube GET.
+	//	if ((ret = server_interact(ctx, YT_ROOT, 0, YT_GET, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//if (_IS("6"))	//6. Write Reddit GET.
+	//	if ((ret = server_interact(ctx, 0, REDDIT_FLDR, REDDIT_GET, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//if (_IS("7"))	//7. Write Instagram GET.
+	//	(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_GET, INSTA_HOST, HTTPS_PORT);
+	//if (_IS("8"))	//8. Write Slack GET.
+	//	(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_GET, SLACK_HOST, HTTPS_PORT);
+
+
+	//if (_IS("9"))	//9. Write Youtube POST.
+	//	if ((ret = server_interact(ctx, 0, YT_FLDR, YT_POST, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//if (_IS("10"))//10. Write Reddit POST.
+	//	if ((ret = server_interact(ctx, 0, REDDIT_FLDR, REDDIT_POST, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//if (_IS("11"))	//11. Write Instagram POST.
+	//	(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_POST, INSTA_HOST, HTTPS_PORT);
+	//if (_IS("12"))	//12. Write Slack POST.*/
+	//	(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_POST, SLACK_HOST, HTTPS_PORT);
+	//if (_IS("13"))
+	//	(void)test_interact;
+
 
 cleanup:
 
@@ -227,42 +212,62 @@ finish:
 }
 
 
-static int cert_show_details(const pub_key_alg_t pubEncAlg,
+
+
+//Change it to only to load cert from a file then call showx509
+static int cert_show_details(const pub_key_enc_t pubEncAlg,
 	const char *certPath) {
 #define GN_INF(T, V) \
 	char V[CERT_DET_LEN]; \
 	nameSz = wolfSSL_X509_NAME_get_text_by_NID(name, T, \
 	V, sizeof(V)); \
 	printf(#V " = %s\n", V);
-	int ret, nameSz, suc; size_t i;
 
-	WOLFSSL_X509 *cert;
+	int ret, nameSz, sigType, suc; size_t i;
+
+
+	WOLFSSL_X509 *cert = (WOLFSSL_X509*)wolfSSL_Malloc(DYNAMIC_TYPE_X509);
+
 	WOLFSSL_EVP_PKEY *pubKeyTmp;
-
+	WOLFSSL_X509_NAME *name; 
 	RsaKey pubKeyRsa;
 	ecc_key *pubKeyEcc;
 
-	WOLFSSL_X509_NAME *name; word32 idx;
+	word32 idx;
 
+
+	char *issuer, *subject, *altName;
+	
 	// 1 Load cert from file
 	if ((cert = wolfSSL_X509_load_certificate_file(certPath, SSL_FILETYPE_PEM)) == NULL)
 		eprintf("Unable to load cert file to memory.\n", finish)
 
-	// Retrieve public key from cert first
-	if ((pubKeyTmp = wolfSSL_X509_get_pubkey(cert)) == NULL)
-		eprintf("Failed to retrieve public key.\n", pu_key_cleanup)
+	if ((name = wolfSSL_X509_get_subject_name(cert)) == NULL)
+		eprintf("Failed to extract subjectName info.\n", clean_all)
 
+	subject = wolfSSL_X509_NAME_oneline(name, 0, 0);
+	issuer = wolfSSL_X509_NAME_oneline(wolfSSL_X509_get_issuer_name(cert), 0, 0);
+
+	printf("%s: %s\n%s: %s\n", "Issuer:", issuer, "Subject:", subject);
+
+	pubKeyTmp = wolfSSL_X509_get_pubkey(cert);
+	if (pubKeyTmp == NULL)
+		eprintf("wolfSSL_X509_get_pubkey failed", pu_key_cleanup);
+
+	idx = 0;
 	// Decode accordingly
 	switch (pubEncAlg) {
 		case ENC_RSA:
 			wc_InitRsaKey(&pubKeyRsa, NULL);
 			ret = wc_RsaPublicKeyDecode((byte*)pubKeyTmp->pkey.ptr, &idx,
 				&pubKeyRsa, pubKeyTmp->pkey_sz);
+			printf("1\n");
 			break;
 		case ENC_ECC:
 			wc_ecc_init(&pubKeyEcc);
 			ret = wc_EccPublicKeyDecode((byte*)pubKeyTmp->pkey.ptr,
 				&idx, &pubKeyEcc, pubKeyTmp->pkey_sz);
+			printf("2\n");
 			break;
 		default:
 			eprintf("Invalid pub key encryption type.\n", ecc_key_cleanup)
@@ -271,22 +276,28 @@ static int cert_show_details(const pub_key_alg_t pubEncAlg,
 	if (ret != 0)
 		eprintf("Failed to decode public key.\n", clean_all)
 
-	if ((name = wolfSSL_X509_get_subject_name(cert)) == NULL)
-		eprintf("Failed to extract subjectName info.\n", clean_all)
+	printf("PUBLIC KEY:\n");
+	for (i = 0; i < pubKeyTmp->pkey_sz; ++i) {
+		printf("%02X", pubKeyTmp->pkey.ptr[i] & 0xFF);
+	} printf("\n");
+
+	/* extract signatureType */
+	sigType = wolfSSL_X509_get_signature_type(cert);
+	if (sigType == 0)
+		eprintf("wolfSSL_X509_get_signature_type failed", clean_all);
+	printf("SIG TYPE = %d\n", sigType);
+
+	/* extract subjectName info */
+	name = wolfSSL_X509_get_subject_name(cert);
+	if (name == NULL)
+		eprintf("wolfSSL_X509_get_subject_name failed", clean_all);
 
 	GN_INF(ASN_COMMON_NAME, commonName)
 	GN_INF(ASN_COUNTRY_NAME, countryName)
 	GN_INF(ASN_LOCALITY_NAME, localityName)
 	GN_INF(ASN_STATE_NAME, stateName)
 	GN_INF(ASN_ORG_NAME, orgName)
-	GN_INF(ASN_ORGUNIT_NAME, orgUnitName)
-
-	printf("\n\n");
-
-	printf("---Whole Public key in Hex---\n\n");
-	for (i = 0; i < pubKeyTmp->pkey_sz; ++i) {
-		printf("%02X ", pubKeyTmp->pkey.ptr[i] & 0xFF);
-	}
+	GN_INF(ASN_ORGUNIT_NAME, orgUnit);
 
 	// TODO: Put Modulus and Exponent details here if RSA Pub key
 
@@ -295,6 +306,9 @@ static int cert_show_details(const pub_key_alg_t pubEncAlg,
 #undef GN_INF
 clean_all:
 
+XFREE(subject, 0, DYNAMIC_TYPE_OPENSSL);
+XFREE(issuer, 0, DYNAMIC_TYPE_OPENSSL);
+XFREE(cert, 0, DYNAMIC_TYPE_X509);
 
 ecc_key_cleanup :
 	wc_ecc_free(&pubKeyEcc);
@@ -303,10 +317,72 @@ rsa_key_cleanup:
 pu_key_cleanup:
 	wolfSSL_EVP_PKEY_free(pubKeyTmp);
 finish:
-	printf("before retunring 0\n");
+	printf("before returning 0\n");
 	return 0;
 }
 
+static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
+{
+	char buffer[WOLFSSL_MAX_ERROR_SZ];
+
+	WOLFSSL_X509* peer;
+	(void)preverify;
+
+	/* Verify Callback Arguments:
+	* preverify:           1=Verify Okay, 0=Failure
+	* store->error:        Failure error code (0 indicates no failure)
+	* store->current_cert: Current WOLFSSL_X509 object (only with OPENSSL_EXTRA)
+	* store->error_depth:  Current Index
+	* store->domain:       Subject CN as string (null term)
+	* store->totalCerts:   Number of certs presented by peer
+	* store->certs[i]:     A `WOLFSSL_BUFFER_INFO` with plain DER for each cert
+	* store->store:        WOLFSSL_X509_STORE with CA cert chain
+	* store->store->cm:    WOLFSSL_CERT_MANAGER
+	* store->ex_data:      The WOLFSSL object pointer
+	* store->discardSessionCerts: When set to non-zero value session certs
+	will be discarded (only with SESSION_CERTS)
+	*/
+
+	printf("In verification callback, error = %d, %s\n", store->error,
+		wolfSSL_ERR_error_string(store->error, buffer));
+
+	peer = store->current_cert;
+	if (peer) {
+		char* issuer = wolfSSL_X509_NAME_oneline(
+			wolfSSL_X509_get_issuer_name(peer), 0, 0);
+		char* subject = wolfSSL_X509_NAME_oneline(
+			wolfSSL_X509_get_subject_name(peer), 0, 0);
+		printf("\tPeer's cert info:\n issuer : %s\n subject: %s\n", issuer,
+			subject);
+		XFREE(subject, 0, DYNAMIC_TYPE_OPENSSL);
+		XFREE(issuer, 0, DYNAMIC_TYPE_OPENSSL);
+	} else
+		printf("\tPeer has no cert!\n");
+
+	printf("\tPeer certs: %d\n", store->totalCerts);
+
+	printf("\tSubject's domain name at %d is %s\n", store->error_depth, store->domain);
+
+	/* Testing forced fail case by return zero */
+	if (myVerifyAction == VERIFY_FORCE_FAIL) {
+		return 0; /* test failure case */
+	}
+
+	if (myVerifyAction == VERIFY_OVERRIDE_DATE_ERR &&
+		(store->error == ASN_BEFORE_DATE_E || store->error == ASN_AFTER_DATE_E)) {
+		printf("Overriding cert date error as example for bad clock testing\n");
+		return 1;
+	}
+
+	/* If error indicate we are overriding it for testing purposes */
+	if (store->error != 0 && myVerifyAction == VERIFY_OVERRIDE_ERROR) {
+		printf("\tAllowing failed certificate check, testing only "
+			"(shouldn't do this in production)\n");
+	}
+
+	/* A non-zero return code indicates failure override */
+	return (myVerifyAction == VERIFY_OVERRIDE_ERROR) ? 1 : preverify;
+}
 
 static int cert_manual_verify(const char *caCert,
 	const char *vrfCert) {
@@ -344,12 +420,164 @@ finish:
 	return suc;
 }
 
-static int test_interest(WOLFSSL_CTX *ctx) {
-	int suc;
 
-	return 0;
+
+static int build_addr(SOCKADDR_IN_T *addr, const char *peer, word16 port) {
+
+	if (addr == NULL)
+		return 0;
+
+	XMEMSET(addr, 0, sizeof(SOCKADDR_IN_T));
+
+	WSADATA wsaData; int res, useLookup;	
+
+	//For windows this one is required for gethostbyname to work
+	if ((res = WSAStartup(MAKEWORD(2, 2), &wsaData)) != NULL) {
+		fprintf(stderr, "[Error] WSASTARTUP Failed: %d\n", res);
+		return 0;
+	}
+
+	struct hostent *entry = gethostbyname(peer);
+	//Set IP address to first IP using lookup
+	if (entry) {
+		XMEMCPY(&addr->sin_addr.s_addr, entry->h_addr_list[0],
+			entry->h_length);
+	} else {
+		if (is_valid_ip(peer))
+			addr->sin_addr.s_addr = inet_addr(peer);
+		else
+			return 0;
+	}
+
+	addr->sin_family = AF_INET;
+	addr->sin_port = XHTONS(port);
+
+	return 1;
 }
 
+
+static int tcp_connect(SOCKET_T *sockfd, const char *ip, word16 *port, WOLFSSL *ssl) {
+	// Build addr Object first using IP/Hostname
+	SOCKADDR_IN_T addr;
+	if (!build_addr(&addr, ip, port))
+		return 0;
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);	
+	return 1;
+}
+
+
+static void print_peer_details(WOLFSSL *ssl) {
+	printf("inside print_\n");
+	const char *name;
+	WOLFSSL_X509 *cert;
+
+	cert = wolfSSL_get_peer_certificate(ssl);
+	if (cert) {
+		show_x509_info(cert);
+		show_pkey_details(cert);
+		show_x509_name_info(cert);
+	}
+	else {
+		fprintf(stderr, "No cert found from peer!\n");
+	}
+	wolfSSL_FreeX509(cert);
+
+	if ((name = wolfSSL_get_curve_name(ssl)) != NULL)
+		printf("%s %s\n", "Name:", name);
+}
+
+
+/* To test conncetion with getting peer certs automatically */
+static int test_interact(WOLFSSL_CTX *ctx, const char *host, VRF_ACTION_T verifyAction) {
+
+	struct sockaddr_in servAddr;
+	char servIp[IP_BUFF_SIZE];
+	////
+	int suc, res, err, ret;
+	SOCKET_T sockfd; WOLFSSL *ssl;
+
+	// Different level different way of handling
+	switch (verifyAction) {
+		case VERIFY_FORCE_FAIL:
+			wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, myVerify); break;
+		case VERIFY_OVERRIDE_DATE_ERR:
+			wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, myVerify); break;
+		case VERIFY_NONE:
+			wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0); break;
+		default:
+			wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
+	}
+	
+
+	if ((ssl = wolfSSL_new(ctx)) == NULL)
+		fprintf(stderr, "unable to get SSL object");
+	else {
+		printf("1\n");
+	}
+
+	if (wolfSSL_CTX_load_verify_locations(ctx, REDDIT_ROOT, 0) != SSL_SUCCESS) {
+		fprintf(stderr, "Error loading ../certs/ca-cert.pem, please checkthe file.\n");
+	}
+
+	if (!host_to_ip(host, servIp))
+		eprintf("Unable to convert hostname to IP Address.\n", finish)
+	else
+		printf("Converted Hostname to IP Address: %s .\n", servIp);
+
+	// Proceed with setting up socket details
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	memset(&servAddr, 0, sizeof(servAddr));
+
+	// Configure server details
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_port = htons(HTTPS_PORT);
+	servAddr.sin_addr.s_addr = inet_addr(servIp);
+
+	if (connect(sockfd, (struct sockaddr*) &servAddr, sizeof(servAddr)) == -1)
+		eprintf("Failed to connect to socket\n", socket_cleanup)
+
+
+	/*if (!tcp_connect(&sockfd, host, HTTPS_PORT, ssl))
+		eprintf("tcp_connect failed", socket_cleanup)
+	else {
+		printf("2\n");
+	}*/
+	
+	if (wolfSSL_set_fd(ssl, sockfd) != WOLFSSL_SUCCESS)
+		eprintf("error in setting fd", ssl_cleanup)
+	else {
+		printf("3\n");
+	}
+
+	wolfSSL_check_domain_name(ssl, host);
+
+	do {
+		err = 0; /* reset error */
+		ret = wolfSSL_connect(ssl);
+		if (ret != WOLFSSL_SUCCESS) {
+			err = wolfSSL_get_error(ssl, 0);
+		}
+	} while (err == WC_PENDING_E);
+	if (ret != WOLFSSL_SUCCESS) {
+		fprintf(stderr, "SSL_connect failed %d %d\n", ret, err);
+	}
+
+
+	print_peer_details(ssl);
+	
+	res = 1;
+
+ssl_cleanup:
+	wolfSSL_free(ssl);
+socket_cleanup:
+	close(sockfd);
+
+finish:
+	return res;
+}
+
+
+//Full one cycle reference
 static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *certFldr,
 	const char *sendMsg, const char *servHostName, const int portNo) {
 
@@ -380,11 +608,11 @@ static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *c
 		eprintf("Failed to connect to socket\n", socket_cleanup)
 
 	//tcp_connect(&sockfd, host, port, dtlsUDP, dtlsSCTP, ssl);
-
 	// Load and verify the certs
 	if ((ret = wolfSSL_CTX_load_verify_locations(ctx, certPath, certFldr)) != SSL_SUCCESS)
 		eprintf("Failed to load cert file.\n", finish);
 
+	
 	if ((ssl = wolfSSL_new(ctx)) == NULL)
 		eprintf("Failed to load SSL struct.\n", ssl_cleanup)
 
@@ -405,6 +633,7 @@ static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *c
 	}
 
 	(void)ClientWrite(ssl, sendMsg, strlen(sendMsg), "", 1);
+
 	for (i = 1; i; i = ClientRead(ssl, servResponse, sizeof(servResponse) - 1, 1, "", 1));
 
 	printf("===%s Respond===\n %s\n", servHostName, servResponse);
@@ -512,6 +741,7 @@ static int ClientRead(WOLFSSL *ssl, char *reply, int replyLen, int mustRead,
 	return err;
 }
 
+
 /** Helper function to write Message with GET/POST into SSL object */
 static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str)
 {
@@ -539,11 +769,13 @@ static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str
 #endif
 		);
 	if (ret != msgSz) {
+		printf("hehe\n");
 		printf("SSL_write%s msg error %d, %s\n", str, err,
 			wolfSSL_ERR_error_string(err, buffer));
 	}
 	return err;
 }
+
 
 
 
