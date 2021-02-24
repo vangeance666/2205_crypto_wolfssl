@@ -4,14 +4,32 @@
 #include <windows.h>
 #include <time.h>
 
+#define WOLFSSL_ALWAYS_VERIFY_CB
+#define WOLFSSL_VERIFY_CB_ALL_CERTS
+#define SESSION_CERTS
+#define OPENSSL_ALL //Need this if not cant enable OCSP
+#define SHOW_CERTS
+#define WOLFSSL_DEBUG
+
+#define HAVE_CRL
+#define HAVE_OCSP
+#define HAVE_CERTIFICATE_STATUS_REQUEST
+#define HAVE_CERTIFICATE_STATUS_REQUEST_V2
+
 
 #include <wolfssl/wolfcrypt/settings.h>
+
+
 
 #include <wolfssl/wolfcrypt/rsa.h>
 #include <wolfssl/wolfcrypt/asn.h>
 #include <wolfssl/wolfcrypt/ecc.h>
 
+// Need these 3 to enable OCSP for cert manager
+
+
 #include <wolfssl/ssl.h>
+
 
 #include <wolfssl/openssl/rsa.h>
 #include <wolfssl/openssl/x509v3.h>
@@ -156,7 +174,7 @@ int main(int argc, char** argv)
 
 
 
-	test_interact(ctx, "www.youtube.com", VERIFY_OVERRIDE_DATE_ERR);
+	test_interact(ctx, "youtube.com", VERIFY_OVERRIDE_DATE_ERR);
 	//cert_show_details(ENC_RSA, YT_ROOT);
 
 
@@ -323,11 +341,17 @@ finish:
 
 static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 {
+
 	char buffer[WOLFSSL_MAX_ERROR_SZ];
 
 	WOLFSSL_X509* peer;
 	(void)preverify;
 
+	WOLFSSL_BIO *bio = NULL;
+	WOLFSSL_STACK *sk = NULL;
+	X509 *x509 = NULL;
+	int i = 0;
+	
 	/* Verify Callback Arguments:
 	* preverify:           1=Verify Okay, 0=Failure
 	* store->error:        Failure error code (0 indicates no failure)
@@ -343,8 +367,12 @@ static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 	will be discarded (only with SESSION_CERTS)
 	*/
 
+	printf("Preveryify: %d\n", preverify);
+	
 	printf("In verification callback, error = %d, %s\n", store->error,
 		wolfSSL_ERR_error_string(store->error, buffer));
+
+
 
 	peer = store->current_cert;
 	if (peer) {
@@ -354,8 +382,36 @@ static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 			wolfSSL_X509_get_subject_name(peer), 0, 0);
 		printf("\tPeer's cert info:\n issuer : %s\n subject: %s\n", issuer,
 			subject);
+
+		bio = wolfSSL_BIO_new(wolfSSL_BIO_s_file());
+		if (bio != NULL) {
+			wolfSSL_BIO_set_fp(bio, stdout, BIO_NOCLOSE);
+			wolfSSL_X509_print(bio, peer);
+			wolfSSL_BIO_free(bio);
+		}
+
+		printf("---------------------------------\n");
 		XFREE(subject, 0, DYNAMIC_TYPE_OPENSSL);
 		XFREE(issuer, 0, DYNAMIC_TYPE_OPENSSL);
+
+		
+		
+		/* retrieve x509 certs and display them on stdout */
+		sk = wolfSSL_X509_STORE_GetCerts(store);
+
+		for (i = 0; i < wolfSSL_sk_X509_num(sk); i++) {
+			printf("I value: %d\n", i);
+			x509 = wolfSSL_sk_X509_value(sk, i);
+			bio = wolfSSL_BIO_new(wolfSSL_BIO_s_file());
+			if (bio != NULL) {
+				wolfSSL_BIO_set_fp(bio, stdout, BIO_NOCLOSE);
+				wolfSSL_X509_print(bio, x509);
+				wolfSSL_BIO_free(bio);
+			}
+		}
+		wolfSSL_sk_X509_free(sk);
+
+		
 	} else
 		printf("\tPeer has no cert!\n");
 
@@ -380,9 +436,12 @@ static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 			"(shouldn't do this in production)\n");
 	}
 
+	return 0;
 	/* A non-zero return code indicates failure override */
 	return (myVerifyAction == VERIFY_OVERRIDE_ERROR) ? 1 : preverify;
 }
+
+
 
 static int cert_manual_verify(const char *caCert,
 	const char *vrfCert) {
@@ -496,18 +555,27 @@ static int test_interact(WOLFSSL_CTX *ctx, const char *host, VRF_ACTION_T verify
 	int suc, res, err, ret;
 	SOCKET_T sockfd; WOLFSSL *ssl;
 
-	// Different level different way of handling
-	switch (verifyAction) {
-		case VERIFY_FORCE_FAIL:
-			wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, myVerify); break;
-		case VERIFY_OVERRIDE_DATE_ERR:
-			wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, myVerify); break;
-		case VERIFY_NONE:
-			wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0); break;
-		default:
-			wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
-	}
-	
+	//// Different level different way of handling
+	//switch (verifyAction) {
+	//	case VERIFY_FORCE_FAIL:
+	//		wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, myVerify); break;
+	//	case VERIFY_OVERRIDE_DATE_ERR:
+	//		wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, myVerify); break;
+	//	case VERIFY_NONE:
+	//		wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0); break;
+	//	default:
+	//		wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
+	//}
+
+	//wolfSSL_CTX_EnableOCSPStapling(ctx);
+		/*wolfSSL_UseOCSPStapling()
+		wolfSSL_CTX_EnableOCSP()*/
+
+	wolfSSL_CTX_EnableOCSPStapling(ctx);
+	wolfSSL_UseOCSPStapling(ssl, WOLFSSL_CSR_OCSP, WOLFSSL_CSR_OCSP_USE_NONCE);
+	wolfSSL_CTX_EnableOCSP(ctx, 0);
+
+	wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, myVerify);
 
 	if ((ssl = wolfSSL_new(ctx)) == NULL)
 		fprintf(stderr, "unable to get SSL object");
@@ -515,8 +583,8 @@ static int test_interact(WOLFSSL_CTX *ctx, const char *host, VRF_ACTION_T verify
 		printf("1\n");
 	}
 
-	if (wolfSSL_CTX_load_verify_locations(ctx, REDDIT_ROOT, 0) != SSL_SUCCESS) {
-		fprintf(stderr, "Error loading ../certs/ca-cert.pem, please checkthe file.\n");
+	if (wolfSSL_CTX_load_verify_locations(ctx, YT_ROOT, 0) != SSL_SUCCESS) {
+		fprintf(stderr, "Error loading "YT_ROOT", please checkthe file.\n");
 	}
 
 	if (!host_to_ip(host, servIp))

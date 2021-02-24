@@ -1534,7 +1534,7 @@ THREAD_RETURN WOLFSSL_THREAD client_test(void* args)
     unsigned char alpn_opt = 0;
     char*  cipherList = NULL;
     int    useDefCipherList = 0;
-    const char* verifyCert;
+    const char*  verifyCert;
     const char* ourCert;
     const char* ourKey;
 
