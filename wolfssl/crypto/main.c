@@ -4,21 +4,25 @@
 #include <windows.h>
 #include <time.h>
 
-#define WOLFSSL_ALWAYS_VERIFY_CB
-#define WOLFSSL_VERIFY_CB_ALL_CERTS
-#define SESSION_CERTS
-#define OPENSSL_ALL //Need this if not cant enable OCSP
-#define SHOW_CERTS
-#define WOLFSSL_DEBUG
 
-#define HAVE_CRL
-#define HAVE_OCSP
-#define HAVE_CERTIFICATE_STATUS_REQUEST
-#define HAVE_CERTIFICATE_STATUS_REQUEST_V2
 
+
+//#define WOLFSSL_ALWAYS_VERIFY_CB
+//#define WOLFSSL_VERIFY_CB_ALL_CERTS
+//#define SESSION_CERTS
+//#define OPENSSL_ALL //Need this if not cant enable OCSP
+//#define SHOW_CERTS
+//#define WOLFSSL_DEBUG
+//
+//#define HAVE_CRL
+//#define HAVE_OCSP
+//#define HAVE_CERTIFICATE_STATUS_REQUEST
+//#define HAVE_CERTIFICATE_STATUS_REQUEST_V2
+
+#define WOLFSSL_USER_SETTINGS // Makes all SSL header to include our defined settings
 
 #include <wolfssl/wolfcrypt/settings.h>
-
+#include <wolfssl/ssl.h>
 
 
 #include <wolfssl/wolfcrypt/rsa.h>
@@ -28,7 +32,7 @@
 // Need these 3 to enable OCSP for cert manager
 
 
-#include <wolfssl/ssl.h>
+
 
 
 #include <wolfssl/openssl/rsa.h>
@@ -39,8 +43,16 @@
 #include "common.h"
 #include "certfields.h"
 
+#define crlPemDir "../certs/crl"
+static void CRL_CallBack(const char *url)
+{
+	printf("CRL callback url = %s\n", url);
+}
 
+#define MOZILLA_ROOT "./certs/mozilla-roots-cas.pem"
 #define SIT_FLDR "./certs/sit/"
+
+
 #define SIT_CHAIN SIT_FLDR "singaporetech-chain.pem"
 #define SIT_ROOT SIT_FLDR "singaporetech-root.pem"
 #define SIT_GET "GET / HTTP/1.1\r\nHost: www.singaporetech.edu.sg\r\n\r\n"
@@ -199,26 +211,25 @@ int main(int argc, char** argv)
 	//	if ((ret = cert_manual_verify(ctx, REDDIT_MID, REDDIT_SERV))) fprintf(stdout, "Return Code: %d\n", ret);
 
 	//if (_IS("5"))	//5. Write Youtube GET.
-	//	if ((ret = server_interact(ctx, YT_ROOT, 0, YT_GET, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//	if ((ret = server_interact(ctx, MOZILLA_ROOT, 0, YT_GET, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
 	//if (_IS("6"))	//6. Write Reddit GET.
-	//	if ((ret = server_interact(ctx, 0, REDDIT_FLDR, REDDIT_GET, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//	if ((ret = server_interact(ctx, MOZILLA_ROOT, 0, REDDIT_GET, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
 	//if (_IS("7"))	//7. Write Instagram GET.
-	//	(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_GET, INSTA_HOST, HTTPS_PORT);
+	//	(void)server_interact(ctx, MOZILLA_ROOT, 0, INSTA_GET, INSTA_HOST, HTTPS_PORT);
 	//if (_IS("8"))	//8. Write Slack GET.
-	//	(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_GET, SLACK_HOST, HTTPS_PORT);
+	//	(void)server_interact(ctx, MOZILLA_ROOT, 0, SLACK_GET, SLACK_HOST, HTTPS_PORT);
 
 
 	//if (_IS("9"))	//9. Write Youtube POST.
-	//	if ((ret = server_interact(ctx, 0, YT_FLDR, YT_POST, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//	if ((ret = server_interact(ctx, MOZILLA_ROOT, 0, YT_POST, YT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
 	//if (_IS("10"))//10. Write Reddit POST.
-	//	if ((ret = server_interact(ctx, 0, REDDIT_FLDR, REDDIT_POST, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
+	//	if ((ret = server_interact(ctx, MOZILLA_ROOT, 0, REDDIT_POST, REDDIT_HOST, HTTPS_PORT))) fprintf(stdout, "Finished %d\n", ret);
 	//if (_IS("11"))	//11. Write Instagram POST.
-	//	(void)server_interact(ctx, INSTA_CHAIN, 0, INSTA_POST, INSTA_HOST, HTTPS_PORT);
+	//	(void)server_interact(ctx, MOZILLA_ROOT, 0, INSTA_POST, INSTA_HOST, HTTPS_PORT);
 	//if (_IS("12"))	//12. Write Slack POST.*/
-	//	(void)server_interact(ctx, SLACK_ROOT, 0, SLACK_POST, SLACK_HOST, HTTPS_PORT);
+	//	(void)server_interact(ctx, MOZILLA_ROOT, 0, SLACK_POST, SLACK_HOST, HTTPS_PORT);
 	//if (_IS("13"))
 	//	(void)test_interact;
-
 
 cleanup:
 
@@ -342,6 +353,8 @@ finish:
 static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 {
 
+	//If come here and preverify is 1, means local CA cert already successfully verified.
+	// else do own processing. 
 	char buffer[WOLFSSL_MAX_ERROR_SZ];
 
 	WOLFSSL_X509* peer;
@@ -437,6 +450,7 @@ static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 	}
 
 	return 0;
+
 	/* A non-zero return code indicates failure override */
 	return (myVerifyAction == VERIFY_OVERRIDE_ERROR) ? 1 : preverify;
 }
@@ -464,7 +478,7 @@ static int cert_manual_verify(const char *caCert,
 			ret, wolfSSL_ERR_reason_error_string(ret));
 		goto manager_cleanup;
 	}
-
+	
 	if ((ret = wolfSSL_CertManagerVerify(cm, vrfCert, SSL_FILETYPE_PEM)) != SSL_SUCCESS) {
 		fprintf(stderr, "[Error] wolfSSL_CertManagerVerify() failed (%d): %s\n",
 			ret, wolfSSL_ERR_reason_error_string(ret));
@@ -571,11 +585,53 @@ static int test_interact(WOLFSSL_CTX *ctx, const char *host, VRF_ACTION_T verify
 		/*wolfSSL_UseOCSPStapling()
 		wolfSSL_CTX_EnableOCSP()*/
 
-	wolfSSL_CTX_EnableOCSPStapling(ctx);
-	wolfSSL_UseOCSPStapling(ssl, WOLFSSL_CSR_OCSP, WOLFSSL_CSR_OCSP_USE_NONCE);
+/**
+	For OCSP Stapling need to use these 3
+	wolfSSL_CTX_EnableOCSPStapling()
+	wolfSSL_UseOCSPStapling()
+	wolfSSL_CTX_EnableOCSP()
+*/
+#if defined(HAVE_CERTIFICATE_STATUS_REQUEST)
+	if (wolfSSL_CTX_EnableOCSPStapling(ctx) != WOLFSSL_SUCCESS) {
+		eprintf("can't enable OCSP Stapling Certificate Manager", ssl_cleanup)
+	}
+	if (wolfSSL_CTX_EnableOCSPMustStaple(ctx) != WOLFSSL_SUCCESS)
+		eprintf("can't enable OCSP Must Staple", ssl_cleanup)
+#ifdef HAVE_CERTIFICATE_STATUS_REQUEST
+	if (wolfSSL_UseOCSPStapling(ssl, WOLFSSL_CSR_OCSP, WOLFSSL_CSR_OCSP_USE_NONCE) != WOLFSSL_SUCCESS)
+		eprintf("UseCertificateStatusRequest failed", ssl_cleanup);	
+#endif	
+	wolfSSL_CTX_EnableOCSP(ctx, 0);
+#endif
+
+#ifdef HAVE_CRL
+	if (wolfSSL_EnableCRL(ssl, WOLFSSL_CRL_CHECKALL) != WOLFSSL_SUCCESS) {
+		eprintf("can't enable crl check", ssl_cleanup);
+	}
+	if (wolfSSL_LoadCRL(ssl, crlPemDir, WOLFSSL_FILETYPE_PEM, 0) != WOLFSSL_SUCCESS) {
+		eprintf("can't load crl, check crlfile and date validity", ssl_cleanup);
+	}
+	if (wolfSSL_SetCRL_Cb(ssl, CRL_CallBack) != WOLFSSL_SUCCESS) {
+
+		eprintf("can't set crl callback", ssl_cleanup );
+	}
+	
+#endif
+
+	if (wolfSSL_CTX_EnableOCSPStapling(ctx) != WOLFSSL_SUCCESS) {
+		eprintf("can't enable OCSP Stapling Certificate Manager", ssl_cleanup);
+	}
+
+	if (wolfSSL_UseOCSPStapling(ssl, WOLFSSL_CSR_OCSP,
+		WOLFSSL_CSR_OCSP_USE_NONCE) != WOLFSSL_SUCCESS) {
+		eprintf("Use UseCertificateStatusRequest failed", ssl_cleanup);
+	}
+
 	wolfSSL_CTX_EnableOCSP(ctx, 0);
 
-	wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, myVerify);
+	
+
+	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, myVerify);
 
 	if ((ssl = wolfSSL_new(ctx)) == NULL)
 		fprintf(stderr, "unable to get SSL object");
@@ -583,7 +639,7 @@ static int test_interact(WOLFSSL_CTX *ctx, const char *host, VRF_ACTION_T verify
 		printf("1\n");
 	}
 
-	if (wolfSSL_CTX_load_verify_locations(ctx, YT_ROOT, 0) != SSL_SUCCESS) {
+	if (wolfSSL_CTX_load_verify_locations(ctx, REDDIT_ROOT, 0) != SSL_SUCCESS) {
 		fprintf(stderr, "Error loading "YT_ROOT", please checkthe file.\n");
 	}
 
@@ -619,6 +675,7 @@ static int test_interact(WOLFSSL_CTX *ctx, const char *host, VRF_ACTION_T verify
 
 	wolfSSL_check_domain_name(ssl, host);
 
+	// WolfSSL's way of connecting 
 	do {
 		err = 0; /* reset error */
 		ret = wolfSSL_connect(ssl);
@@ -639,7 +696,6 @@ ssl_cleanup:
 	wolfSSL_free(ssl);
 socket_cleanup:
 	close(sockfd);
-
 finish:
 	return res;
 }
@@ -679,7 +735,6 @@ static int server_interact(WOLFSSL_CTX *ctx, const char *certPath, const char *c
 	// Load and verify the certs
 	if ((ret = wolfSSL_CTX_load_verify_locations(ctx, certPath, certFldr)) != SSL_SUCCESS)
 		eprintf("Failed to load cert file.\n", finish);
-
 	
 	if ((ssl = wolfSSL_new(ctx)) == NULL)
 		eprintf("Failed to load SSL struct.\n", ssl_cleanup)

@@ -3819,6 +3819,7 @@ WOLFSSL_STACK* wolfSSL_X509_STORE_GetCerts(WOLFSSL_X509_STORE_CTX* s)
     int  certIdx = 0;
     WOLFSSL_BUFFER_INFO* cert = NULL;
     DecodedCert* dCert = NULL;
+
     WOLFSSL_X509* x509 = NULL;
     WOLFSSL_STACK* sk = NULL;
     int found = 0;

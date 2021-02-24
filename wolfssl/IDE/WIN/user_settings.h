@@ -1,6 +1,18 @@
 #ifndef _WIN_USER_SETTINGS_H_
 #define _WIN_USER_SETTINGS_H_
 
+#define WOLFSSL_ALWAYS_VERIFY_CB
+#define WOLFSSL_VERIFY_CB_ALL_CERTS
+#define SESSION_CERTS
+#define OPENSSL_ALL //Need this if not cant enable OCSP
+#define SHOW_CERTS
+#define WOLFSSL_DEBUG
+
+#define HAVE_CRL
+#define HAVE_OCSP
+#define HAVE_CERTIFICATE_STATUS_REQUEST
+#define HAVE_CERTIFICATE_STATUS_REQUEST_V2
+
 /* Verify this is Windows */
 #ifndef _WIN32
 #error This user_settings.h header is only designed for Windows
@@ -68,6 +80,13 @@
         /* The servers and clients */
         #define OPENSSL_EXTRA
         #define NO_PSK
+
+		
+		
+		/*Defined by patrick, req for Crypto Projects*/
+
+			
+		/* End */
     #endif
 #endif /* HAVE_FIPS */
 

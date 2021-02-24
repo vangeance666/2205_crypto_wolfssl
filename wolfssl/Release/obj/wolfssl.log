@@ -1,1 +1,2 @@
-﻿  wolfssl.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\wolfssl.lib
+﻿  ssl.c
+  wolfssl.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\wolfssl.lib
