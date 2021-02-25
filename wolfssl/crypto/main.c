@@ -29,7 +29,7 @@
 #include "verify.h"
 #include "junkstobedeleted.h" //Delete once everything sui
 
-#define BUFFER_SIZE 10000
+#define BUFFER_SIZE 2048
 
 #define crlPemDir "../../certs/crl"
 
@@ -98,6 +98,7 @@ int main(int argc, char** argv)
 
 	// Usage for seeing message across.
 	ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
+	//ret = start_session(REDDIT_GET, "reddit.com", HTTPS_PORT);
 
 	//test_crl();
 	//start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
@@ -402,6 +403,7 @@ static int start_session(const char *zmsg, const char *host, word16 port) {
 	/* End of one session */
 
 	printf("serverResponse: \n%s\n", serverResponse);
+	free(serverResponse);
 	// Multiple rounds 
 	
 

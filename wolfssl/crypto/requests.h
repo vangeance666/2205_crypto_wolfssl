@@ -44,9 +44,12 @@ static int ClientRead(WOLFSSL *ssl, char *reply, int replyLen, int mustRead,
 		|| err == WC_PENDING_E
 #endif
 		);
-	if (ret > 0) {
+
+	while (ret > 0) {
 		reply[ret] = 0; /* null terminate */
 		printf("%s%s\n", str, reply);
+		ret = wolfSSL_read(ssl, reply, replyLen);
+		printf("RET == %d\n", ret);
 	}
 
 	return err;
