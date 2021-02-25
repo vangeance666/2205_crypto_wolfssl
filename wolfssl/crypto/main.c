@@ -76,8 +76,8 @@ typedef enum {
 
 static char request[] = "";
 char *createReq(char type[], char url[], char para[]);
-static char *test_build_msg(const char *iType, const char *iUrl, const char *args);
 
+static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer);
 
 int main(int argc, char **argv)
 {
@@ -96,47 +96,50 @@ int main(int argc, char **argv)
 	const char *url = NULL;
 	const char *para = "";
 
-	char myBuff[1000];
-	memset(myBuff, 0, 1000);
+	char request[1000];
+	memset(request, 0, sizeof(request)); 
+	build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
 
-	test_build_msg("POST", "youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("POST", "www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("POST", "https://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("POST", "http://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "https://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("POST", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
-	test_build_msg("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", myBuff); fprintf(stdout, "%s\n", myBuff); memset(myBuff, 0, 1000);
 
+	/*build_msg_header("POST", "www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("POST", "https://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("POST", "http://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "https://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("POST", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));*/
+	//printf(YT_GET);
+
+	
+	ret = start_session(request, "www.youtube.com", HTTPS_PORT);
 
 	//checks if input exist, kind of 
 	if (argc > 2) {
-		type = argv[1]; //GET or POST
-		url = argv[2];	//<url>/<path1>/<path2>
-		para = argv[3]; //parameter=value
+		//type = argv[1]; //GET or POST
+		//url = argv[2];	//<url>/<path1>/<path2>
+		//para = argv[3]; //parameter=value
 		//printf("type = %s , url = %s , para = %s \n",type,url,para);
 		//create request, scroll all the way down to see function
 		
-
-		//createReq(type, url, para);
 
 		//printf("Request: %s\n", request);
 
 		//query request?
 		//ret = start_session(request, url, HTTPS_PORT);
 	}
+
+
 	/////////////////
 	//Usage for seeing message across.
 	/*ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
 
-<<<<<<< Updated upstream
 	// Usage for seeing message across.
 	ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
 	//ret = start_session(REDDIT_GET, "reddit.com", HTTPS_PORT);
@@ -144,11 +147,11 @@ int main(int argc, char **argv)
 	//test_crl();
 	//start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
 	//cert_show_details(ENC_RSA, YT_ROOT);
-=======
+
 	test_crl();
 	start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
 	cert_show_details(ENC_RSA, YT_ROOT);*/
->>>>>>> Stashed changes
+
 
 
 	//print_help();
@@ -488,38 +491,16 @@ char *getPath(char url[], char host[]) {
 	return url;
 }
 
-#define MSGFREE(M) \
- if (M) { if (M->host)  } 
-
-typedef enum {
-	MSG_GET,
-	MSG_POST
-} msg_header_t;
-
-typedef struct RQ_MSG {
-	char *type;
-	char *path;
-	char *host;	
-	char **args;
-} RQ_MSG_T;
 
 
-
-static char *gen_msg_string(RQ_MSG_T *requestMsg) {
-	char *r;
-
-}
-
-
-
-static char *test_build_msg(const char *iType, const char *iUrl, const char *args, char *outBuffer) {
+static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer) {
 #define SET_FIRST_CUT(X) \
 if (offset == -1) { \
 offset = str_index(X, iUrl, 1); \
 cutSz = sizeof(X) - 1; \
 }
 	
-#define _J(X) strcat(retMsg, X);
+#define _J(X) strcat(outBuffer, X);
 
 	// Check if is not empty
 	if (!iType || !iUrl) {
@@ -527,22 +508,17 @@ cutSz = sizeof(X) - 1; \
 		return 0; //Type and URL cant be empty, args Optional
 	}
 
-		
-
-	char retMsg[1000];
-	size_t i;
-	const char *sz, *cut, *b, *a;
-	char *host, *path, *params;
+	size_t i; 
+	const char *sz, *cut, *host, *path;
 
 	/* Start of extracting host and path */
-	int offset = -1, cutSz = -1, firstSlashOffset = -1;	
+	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret;	
 	/* URL will split into hostname and path. */
 	// The sequence matters 
 	SET_FIRST_CUT("https://www.");
 	SET_FIRST_CUT("http://www.");
 	SET_FIRST_CUT("www.");
 
-	
 	for (sz = iUrl; *sz; ) ++sz; 
 
 	/*printf("iUrl:%s\noffset %d\ncutSZ:%d\n", iUrl, offset, cutSz);
@@ -565,72 +541,33 @@ cutSz = sizeof(X) - 1; \
 			path = str_alloc_copy("/"); // If no slash treat path as /
 		}
 	}
-	else {
-		printf("empty CUt\n");
+	else 
 		goto cleanup;
-	}
+	
 
-	//fprintf(stdout, "Host:%s\nPath:%s\n", host, path);
-	//if (str_eq(HDR_POST, iType, 1)) {
-	//	_J("POST ")_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
-	//	_J(HDR_HOST" ")_J(host)_J(FLD_ENDLN)
-	//	if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
-	//} else if (str_eq("GET", iType, 1)) {
-	//	_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_ENDLN)
-	//	_J(HDR_HOST" ")_J(host)_J(FLD_FINISH) 
-	//}
-	//else {
-	//	return 0; //Invalid mode
-	//}
-
+	fprintf(stdout, "Host:%s\nPath:%s\n", host, path);
 	if (str_eq(HDR_POST, iType, 1)) {
-		strcat(outBuffer, "POST ");
-		strcat(outBuffer, path);
-		strcat(outBuffer, " "HDR_HTTP" "FLD_ENDLN);
-		strcat(outBuffer, HDR_HOST" ");
-		strcat(outBuffer, host);
-		strcat(outBuffer, FLD_ENDLN);
-		if (args) {
-			strcat(outBuffer, args);
-			strcat(outBuffer, FLD_FINISH);
-		}
-		else { strcat(outBuffer, FLD_ENDLN); };
+		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
+		_J(HDR_HOST" www.")_J(host)_J(FLD_ENDLN)
+		if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
+		ret = 1;
+	} else if (str_eq("GET", iType, 1)) {
+		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_ENDLN)
+		_J(HDR_HOST" www.")_J(host)_J(FLD_FINISH) 
+		ret = 1;
 	}
-	else if (str_eq("GET", iType, 1)) {
-		strcat(outBuffer, "GET ");
-		strcat(outBuffer, path);
-		if (args) {
-			if (*args != '?') {
-				strcat(outBuffer, "?");
-				strcat(outBuffer, args);
-			}
-			else {
-				strcat(outBuffer, args);
-			}
-		}
-		strcat(outBuffer, " "HDR_HTTP" "FLD_ENDLN);
-		strcat(outBuffer, HDR_HOST" ");
-		strcat(outBuffer, host);
-		strcat(outBuffer, FLD_FINISH);
-	}
-	else {
-		return 0; //Invalid mode
-	}
-	//fprintf(stdout, "retMsg:%s\n", retMsg);
 
-
+	
 cleanup:
 #undef _J
 #undef FLD_FINISH
 #undef FLD_ENDLN
 #undef SET_FIRST_CUT
 	
-	free(host);
-	free(path);
-	free(cut);
-
-
-	return 0;
+if (host) free(host);
+if (path) free(path);
+if (cut) free(cut);
+	return ret;
 }
 
 
