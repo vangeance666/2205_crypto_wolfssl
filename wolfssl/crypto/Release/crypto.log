@@ -1,6 +1,59 @@
-﻿  Generating code
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(259): warning C4700: uninitialized local variable 'ssl' used
-  All 988 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+﻿  main.c
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(80,54): warning C4474: 'fprintf' : too many arguments passed for format string
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(80,54): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(86,9): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(79,20): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(86,17): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(71,10): warning C4101: 'wsaData': unreferenced local variable
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(101,14): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(111,11): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\common.h(97,6): warning C4101: 'i': unreferenced local variable
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(7,26): warning C4013: 'print_cert_details' undefined; assuming extern returning int
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(21,16): warning C4018: '<': signed/unsigned mismatch
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48,40): warning C4101: 'i': unreferenced local variable
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48,28): warning C4101: 'suc': unreferenced local variable
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48,19): warning C4101: 'sigType': unreferenced local variable
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48,6): warning C4101: 'ret': unreferenced local variable
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(77,10): warning C4102: 'clean_all': unreferenced label
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\verify.h(38,7): warning C4102: 'finish': unreferenced label
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(92,17): warning C4090: 'function': different 'const' qualifiers
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(92,22): warning C4090: 'function': different 'const' qualifiers
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(92,28): warning C4090: 'function': different 'const' qualifiers
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(96,22): warning C4013: 'start_session' undefined; assuming extern returning int
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(127,7): warning C4102: 'finish': unreferenced label
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(79,7): warning C4101: 'input': unreferenced local variable
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(189,7): warning C4102: 'finish': unreferenced label
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(213,58): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(225,23): warning C4090: 'function': different 'const' qualifiers
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(219,10): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(226,28): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(344,49): warning C4020: 'ClientWrite': too many actual parameters
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(355,7): warning C4102: 'finish': unreferenced label
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(412,7): warning C4102: 'finish': unreferenced label
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(444,22): warning C4028: formal parameter 1 different from declaration
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(444,35): warning C4028: formal parameter 2 different from declaration
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(444,46): warning C4028: formal parameter 3 different from declaration
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(466,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(467,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(468,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(469,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(470,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(471,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(472,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(473,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(482,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(483,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(484,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(485,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(486,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(487,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(488,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(489,9): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(451,9): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Generating code
+D:\2205\2205_crypto_wolfssl\wolfssl\crypto\main.c(495): warning C4716: 'createReq': must return a value
+  2 of 990 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    33 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.exe
-  crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.pdb (Full PDB)
+  crypto.vcxproj -> D:\2205\2205_crypto_wolfssl\wolfssl\Release\crypto.exe

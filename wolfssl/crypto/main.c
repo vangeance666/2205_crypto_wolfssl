@@ -1,4 +1,5 @@
 ﻿#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <winsock2.h>
 #include <windows.h>
@@ -69,11 +70,31 @@ typedef enum {
 	SES_HANDSHAKE_FAIL
 } ses_ret_t;
 
+static char request[] = "";
+
 int main(int argc, char** argv)
 {
 
 	int ret;
 	char input[MAX_INPUT];
+	const char* type = NULL;
+	const char* url = NULL;
+	const char* para = "";
+
+	//checks if input exist, kind of 
+	if (argc > 2) {
+		type = argv[1]; //GET or POST
+		url = argv[2]; //<url>/<path1>/<path2>
+		para = argv[3]; //parameter=value
+		printf("type = %s , url = %s , para = %s \n",type,url,para);
+		//create request, scroll all the way down to see function
+		char* createReq(char *type[], char *url[], char * para[]);
+		createReq(type, url, para);
+		printf(request);
+
+		//query request?
+		ret = start_session(request, url, HTTPS_PORT);
+	}
 
 	// Usage for seeing message across.
 	ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
@@ -390,4 +411,85 @@ wolf_cleanup:
 	wolfSSL_Cleanup();
 finish:
 	return retCode;
+}
+
+char* getPath(char url[],char host[]) {
+	//printf("URL is %s and HOST is %s\n", url, host);
+	int i, j, ls, lw, temp, chk = 0;
+	ls = strlen(url);
+	lw = strlen(host);
+	for (i = 0; i < ls; i++)
+	{
+		temp = i;
+		for (j = 0; j < lw; j++)
+		{
+			if (url[i] == host[j])
+				i++;
+		}
+		chk = i - temp;
+		if (chk == lw)
+		{
+			i = temp;
+			for (j = i; j < (ls - lw); j++)
+				url[j] = url[j + lw];
+			ls = ls - lw;
+			url[j] = '\0';
+		}
+	}
+
+//	printf("path is %s", url);
+	return url;
+}
+
+char* createReq(char type[], char url[],char para[]) {
+	char* path = "";
+	char* host = "";
+	char tempurl[] = "";
+	memcpy(tempurl, url, strlen(url) + 1);
+
+	//printf("TempURL is  %s\n", tempurl);
+	host = strtok(url, "/");
+
+	path = getPath(tempurl, host);
+
+	//printf("Host is %s and path is %s\n", host , path);
+
+	
+	if (strcmp(type,"post") == 0) {
+		//should see sth like 
+		//post / http/1.1
+		//Host: <url>
+
+		//parameter=value
+		printf("asd");
+		char header[] = " HTTP/1.1\r\nHost: ";
+		strcat(request, type);
+		strcat(request, "/");
+		strcat(request, path);
+		strcat(request, " ");
+		strcat(request, header);
+		strcat(request, host);
+		strcat(request, "\r\n\r\n");
+		strcat(request, para);
+		//return request;
+	}
+	else if (strcmp(type, "get") == 0) {
+		//should see sth like 
+		//Get /<webpage>?parameter=value http/1.1
+		//Host: <url>
+		printf("lol");
+		char header[] = " HTTP/1.1\r\nHost: ";
+		strcat(request, type);
+		strcat(request, " /");
+		strcat(request, path);
+		strcat(request, "?");
+		strcat(request, para);
+		strcat(request, header);
+		strcat(request, host);
+		strcat(request, "\r\n\r\n");
+		
+		//return request;
+	}
+
+	
 }
