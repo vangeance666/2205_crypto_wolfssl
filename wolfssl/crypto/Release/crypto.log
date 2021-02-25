@@ -1,58 +1,6 @@
-﻿  main.c
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(70): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(80): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(66): warning C4101: 'i': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(14): warning C4013: 'wc_ecc_init' undefined; assuming extern returning int
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(15): warning C4013: 'wc_EccPublicKeyDecode' undefined; assuming extern returning int
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(33): warning C4102: 'clean': unreferenced label
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(69): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(76): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'i': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'suc': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'sigType': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(93): warning C4101: 'ret': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(122): warning C4102: 'clean_all': unreferenced label
-main.c(239): warning C4102: 'finish': unreferenced label
-main.c(173): warning C4101: 'input': unreferenced local variable
-main.c(176): warning C4101: 'ssl': unreferenced local variable
-main.c(175): warning C4101: 'cert': unreferenced local variable
-main.c(309): warning C4018: '<': signed/unsigned mismatch
-main.c(343): warning C4013: 'wc_ecc_free' undefined; assuming extern returning int
-main.c(344): warning C4102: 'rsa_key_cleanup': unreferenced label
-main.c(268): warning C4101: 'altName': unreferenced local variable
-main.c(492): warning C4102: 'finish': unreferenced label
-main.c(508): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-main.c(519): warning C4090: 'function': different 'const' qualifiers
-main.c(513): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238): note: see declaration of 'gethostbyname'
-main.c(520): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
-main.c(505): warning C4101: 'useLookup': unreferenced local variable
-main.c(535): warning C4047: 'function': 'word16' differs in levels of indirection from 'word16 *'
-main.c(535): warning C4024: 'build_addr': different types for formal and actual parameter 3
-main.c(537): warning C4047: '=': 'SOCKET_T *' differs in levels of indirection from 'SOCKET'
-main.c(698): warning C4013: 'close' undefined; assuming extern returning int
-main.c(658): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
-main.c(569): warning C4101: 'suc': unreferenced local variable
-main.c(758): warning C4020: 'ClientWrite': too many actual parameters
-main.c(729): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
-main.c(793): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-main.c(805): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-main.c(798): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238): note: see declaration of 'gethostbyname'
-main.c(799): warning C4474: 'fprintf' : too many arguments passed for format string
-  main.c(799): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-main.c(805): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1868): note: see declaration of 'inet_ntoa'
-  Generating code
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(601): warning C4700: uninitialized local variable 'ssl' used
-  240 of 1181 functions (20.3%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    75 functions had inline decision re-evaluated but remain unchanged
+﻿  Generating code
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(259): warning C4700: uninitialized local variable 'ssl' used
+  All 988 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.exe
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.pdb (Full PDB)

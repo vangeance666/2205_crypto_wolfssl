@@ -3075,17 +3075,22 @@ THREAD_RETURN WOLFSSL_THREAD client_test(void* args)
     #endif
 
         if (wolfSSL_EnableCRL(ssl, WOLFSSL_CRL_CHECKALL) != WOLFSSL_SUCCESS) {
+			printf("HEHE1\n");
             wolfSSL_free(ssl); ssl = NULL;
             wolfSSL_CTX_free(ctx); ctx = NULL;
             err_sys("can't enable crl check");
         }
         if (wolfSSL_LoadCRL(ssl, crlPemDir, WOLFSSL_FILETYPE_PEM, 0)
                                                            != WOLFSSL_SUCCESS) {
+			printf("HEHE2\n");
+
             wolfSSL_free(ssl); ssl = NULL;
             wolfSSL_CTX_free(ctx); ctx = NULL;
             err_sys("can't load crl, check crlfile and date validity");
         }
         if (wolfSSL_SetCRL_Cb(ssl, CRL_CallBack) != WOLFSSL_SUCCESS) {
+			printf("HEHE3\n");
+
             wolfSSL_free(ssl); ssl = NULL;
             wolfSSL_CTX_free(ctx); ctx = NULL;
             err_sys("can't set crl callback");

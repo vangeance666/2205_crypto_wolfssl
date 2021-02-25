@@ -4,7 +4,7 @@
 #define WOLFSSL_ALWAYS_VERIFY_CB
 #define WOLFSSL_VERIFY_CB_ALL_CERTS
 #define SESSION_CERTS
-#define OPENSSL_ALL //Need this if not cant enable OCSP
+//#define OPENSSL_ALL //Need this if not cant enable OCSP
 #define SHOW_CERTS
 #define WOLFSSL_DEBUG
 

@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-
-
-
 /**
 * Checks if the strings are equal.
 * @param  a           The first string.
@@ -25,7 +22,6 @@ static int str_eq(const char *a, const char *b, int ignore_case) {
 		return *a == *b && *a == 0;
 	}
 	return 0;
-
 }
 
 
@@ -59,6 +55,41 @@ static int is_digits(const char *s) {
 		if (!(*s >= '0' && *s <= '9'))
 			return 0;
 	 return 1;	
+}
+
+
+/**
+* Converts hostname to ip address.
+* For e.g www.google.com to 172.217.194.102
+* Similar to how nslookup works
+* @param  inName Pointer of hostname
+* @param  outIp  Buffer to store IP Address
+* @return        1 if success else 0
+*/
+static int host_to_ip(const char *inName, char *outIp) {
+
+	WSADATA wsaData;
+	struct hostent *remoteHost;
+	struct in_addr **addrList;
+
+	int suc, res; size_t i;
+
+	StartTCP();
+
+	if ((remoteHost = gethostbyname(inName)) == NULL) {
+		fprintf(stderr, "[Error] Unabe to gethostname.\n", res);
+		goto finish;
+	}
+
+	addrList = (struct in_addr **)remoteHost->h_addr_list;
+	for (i = 0; addrList[i] != 0; ++i) {
+		strcpy(outIp, inet_ntoa(*addrList[i]));
+		suc = 1;
+		break;
+	}
+
+finish:
+	return suc;
 }
 
 int is_valid_ip(char *ip_str)

@@ -1,84 +1,39 @@
 #ifndef certfields_h
 #define certfields_h
 
-static pub_key_enc_t decode_pub_key(WOLFSSL_EVP_PKEY *pubKeyTmp) {
-
-	pub_key_enc_t pubKeyEncType = ENC_NONE;
-	RsaKey pubKeyRsa;
-	ecc_key *pubKeyEcc;
-	word32 idx;
-	int ret;
-
-
-	idx = 0;
-	wc_ecc_init(&pubKeyEcc);
-	ret = wc_EccPublicKeyDecode((byte*)pubKeyTmp->pkey.ptr,
-		&idx, &pubKeyEcc, pubKeyTmp->pkey_sz);
-	if (ret == 0) {
-		printf("BBBB\n");
-		return ENC_ECC;
-	}
-
-	idx = 0;
-	wc_InitRsaKey(&pubKeyRsa, NULL);
-	ret = wc_RsaPublicKeyDecode((byte*)pubKeyTmp->pkey.ptr, &idx,
-		&pubKeyRsa, pubKeyTmp->pkey_sz);
-	if (ret == 0) {
-		printf("XXXX\n");
-		return ENC_RSA;
-	}
-
-	
-
-clean:
-	printf("Cleaned\n");
-//ecc_key_cleanup:
-//	wc_ecc_free(&pubKeyEcc);
-//rsa_key_cleanup:
-//	wc_FreeRsaKey(&pubKeyRsa);
-	return pubKeyEncType;
+static void print_peer_details(WOLFSSL *ssl) {
+	WOLFSSL_X509 *cert;
+	cert = wolfSSL_get_peer_certificate(ssl);
+	(void)print_cert_details(cert);
+	wolfSSL_FreeX509(cert);
 }
 
 static void show_pkey_details(WOLFSSL_X509 *cert) {
-	printf("show_pkey_details\n");
 
-	size_t i;
-	WOLFSSL_EVP_PKEY *pubKeyTmp;
+	size_t i; WOLFSSL_EVP_PKEY *pubKeyTmp;
+
 	pubKeyTmp = wolfSSL_X509_get_pubkey(cert);
 	if (pubKeyTmp == NULL) {
 		eprintf("Failed to retrieve public key.\n", finish)
 	}
-	
-	pub_key_enc_t temp = decode_pub_key(pubKeyTmp);
 
-	/*RsaKey pubKeyRsa;
-	ecc_key *pubKeyEcc;
-	word32 idx;
-	int ret;
-
-
-	idx = 0;
-	wc_ecc_init(&pubKeyEcc);
-	ret = wc_EccPublicKeyDecode((byte*)pubKeyTmp->pkey.ptr,
-		&idx, &pubKeyEcc, pubKeyTmp->pkey_sz);
-	printf("PUBLIC KEY:\n");
-	for (i = 0; i < pubKeyTmp->pkey_sz; ++i) {
-		printf("%02X", pubKeyTmp->pkey.ptr[i] & 0xFF);
-	} printf("\n");*/
 	printf("PUBLIC KEY:\n");
 	for (i = 0; i < pubKeyTmp->pkey_sz; ++i) {
 		printf("%02X", pubKeyTmp->pkey.ptr[i] & 0xFF);
 	} printf("\n");
-
-	printf("Temp: %d\n", temp);
-	if (temp != ENC_NONE) {
-		printf("PUBLIC KEY:\n");
-		for (i = 0; i < pubKeyTmp->pkey_sz; ++i) {
-			printf("%02X", pubKeyTmp->pkey.ptr[i] & 0xFF);
-		} printf("\n");
-	}
+	
 finish:
 	wolfSSL_EVP_PKEY_free(pubKeyTmp);
+}
+
+static void show_x509_bio_info(WOLFSSL_X509 *cert) {
+	WOLFSSL_BIO *bio = NULL;
+	bio = wolfSSL_BIO_new(wolfSSL_BIO_s_file());
+	if (bio != NULL) {
+		wolfSSL_BIO_set_fp(bio, stdout, BIO_NOCLOSE);
+		wolfSSL_X509_print(bio, cert);
+		wolfSSL_BIO_free(bio);
+	}
 }
 
 static void show_x509_name_info(WOLFSSL_X509 *cert) {
@@ -123,5 +78,8 @@ clean_all:
 	XFREE(subject, 0, DYNAMIC_TYPE_OPENSSL);
 	XFREE(issuer, 0, DYNAMIC_TYPE_OPENSSL);
 }
+
+
+
 
 #endif
