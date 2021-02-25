@@ -150,9 +150,48 @@ static char *str_alloc_copy(const char *s) {
 		return d;
 	}
 	return 0;
-
-
 }
+
+static char *str_slice_copy(const char *s, int start, int end) {
+	int length, i;
+	char *d = 0;
+	const char *p;
+	if (s) {
+		for (p = s; *p; ) ++p;
+		length = end - start;
+		if (length > 0 && length <= (p - s)) {
+			d = (char *)safe_malloc(1 + length);
+			if (d) {
+				for (p = (s + start); *p && p < (s + end); ++p) {
+					d[p - (s + start)] = *p;
+				}
+				d[length] = 0;
+			}
+			return d;
+		}
+	}
+	return 0;
+}
+
+static char **str_split_copy(const char *s, const char delim) {
+
+	const char *p;
+	size_t i = 0; int lastPos = 0;
+	char **dd;
+
+	if (s) {
+		for (p = s; *p; ++p) {
+			if (*p == delim) {
+				dd[i++] = str_slice_copy(s, lastPos, p - s);
+				lastPos = (p - s) + 1; // Prev pos to 
+			}
+		}
+	}
+
+	return 0;
+}
+
+
 #endif
 
 
