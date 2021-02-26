@@ -48,8 +48,18 @@ static int ClientRead(WOLFSSL *ssl, char *reply, int replyLen, int mustRead,
 	while (ret > 0) {
 		reply[ret] = 0; /* null terminate */
 		printf("%s%s\n", str, reply);
-		ret = wolfSSL_read(ssl, reply, replyLen);
-		printf("RET == %d\n", ret);
+
+		//check reply for </html>, if exist exit loop, if not continue calling from buffer
+		if (strstr(reply,"</html>") != NULL) {
+			ret = 0;
+			//printf("exit?");
+		}
+		else {
+			ret = wolfSSL_read(ssl, reply, replyLen);
+			printf("RET == %d\n", ret);
+		}
+
+		
 	}
 
 	return err;
