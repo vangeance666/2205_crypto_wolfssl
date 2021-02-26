@@ -31,16 +31,20 @@
 
 #define BUFFER_SIZE 2048
 
+#define HEADER_SIZE 8192
+
 #define crlPemDir "../../certs/crl"
 
 #define MOZILLA_ROOT "./certs/mozilla-roots-cas.pem"
 
+#define FLD_ENDLN "\r\n"
+#define FLD_FINISH FLD_ENDLN FLD_ENDLN
+#define HDR_HTTP "HTTP/1.1"
+#define HDR_HOST "Host:"
+#define HDR_POST "POST"
+#define HDR_GET "GET"
 
 typedef struct sockaddr_in  SOCKADDR_IN_T;
-
-
-
-//
 
 typedef enum {
 	ADDR_DEFAULT,
@@ -71,30 +75,70 @@ typedef enum {
 } ses_ret_t;
 
 static char request[] = "";
+char *createReq(char type[], char url[], char para[]);
 
-int main(int argc, char** argv)
+static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer);
+
+int main(int argc, char **argv)
 {
 
+	//char *cut;
+	//cut = str_slice_copy(fullStr, 5, 10); // Will extract 5 to 9
+	//int i;
+
+	//printf("CUT: %s\n", cut);
+
+	//free(cut);
+
 	int ret;
-	char input[MAX_INPUT];
-	const char* type = NULL;
-	const char* url = NULL;
-	const char* para = "";
+	//char input[MAX_INPUT];
+	const char *type = NULL;
+	const char *url = NULL;
+	const char *para = "";
+
+	char request[1000];
+	memset(request, 0, sizeof(request)); 
+	build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
+
+
+	/*build_msg_header("POST", "www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("POST", "https://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("POST", "http://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "https://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("POST", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
+	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));*/
+	//printf(YT_GET);
+
+	
+	ret = start_session(request, "www.youtube.com", HTTPS_PORT);
 
 	//checks if input exist, kind of 
 	if (argc > 2) {
-		type = argv[1]; //GET or POST
-		url = argv[2]; //<url>/<path1>/<path2>
-		para = argv[3]; //parameter=value
-		printf("type = %s , url = %s , para = %s \n",type,url,para);
+		//type = argv[1]; //GET or POST
+		//url = argv[2];	//<url>/<path1>/<path2>
+		//para = argv[3]; //parameter=value
+		//printf("type = %s , url = %s , para = %s \n",type,url,para);
 		//create request, scroll all the way down to see function
-		char* createReq(char *type[], char *url[], char * para[]);
-		createReq(type, url, para);
-		printf(request);
+		
+
+		//printf("Request: %s\n", request);
 
 		//query request?
-		ret = start_session(request, url, HTTPS_PORT);
+		//ret = start_session(request, url, HTTPS_PORT);
 	}
+
+
+	/////////////////
+	//Usage for seeing message across.
+	/*ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
 
 	// Usage for seeing message across.
 	ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
@@ -103,6 +147,11 @@ int main(int argc, char** argv)
 	//test_crl();
 	//start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
 	//cert_show_details(ENC_RSA, YT_ROOT);
+
+	test_crl();
+	start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
+	cert_show_details(ENC_RSA, YT_ROOT);*/
+
 
 
 	//print_help();
@@ -113,7 +162,7 @@ int main(int argc, char** argv)
 
 	//fgets(input, MAX_INPUT, stdin);
 
-	/* Can modify program to be like arg parser but thats for later. */
+	///* Can modify program to be like arg parser but thats for later. */
 
 	//if (_IS("1"))	// 1. View Youtube cert publickey info.
 	//	cert_show_details(YT_ROOT);
@@ -378,7 +427,6 @@ static int start_session(const char *zmsg, const char *host, word16 port) {
 	}
 			
 	WOLFSSL_CTX		*ctx;
-
 	
 	/* Init Session */
 	if ((ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
@@ -415,7 +463,7 @@ finish:
 	return retCode;
 }
 
-char* getPath(char url[],char host[]) {
+char *getPath(char url[], char host[]) {
 	//printf("URL is %s and HOST is %s\n", url, host);
 	int i, j, ls, lw, temp, chk = 0;
 	ls = strlen(url);
@@ -443,10 +491,90 @@ char* getPath(char url[],char host[]) {
 	return url;
 }
 
-char* createReq(char type[], char url[],char para[]) {
-	char* path = "";
-	char* host = "";
-	char tempurl[] = "";
+
+
+static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer) {
+#define SET_FIRST_CUT(X) \
+if (offset == -1) { \
+offset = str_index(X, iUrl, 1); \
+cutSz = sizeof(X) - 1; \
+}
+	
+#define _J(X) strcat(outBuffer, X);
+
+	// Check if is not empty
+	if (!iType || !iUrl) {
+		printf("Type and URL cant be empty, args Optional\n");
+		return 0; //Type and URL cant be empty, args Optional
+	}
+
+	size_t i; 
+	const char *sz, *cut, *host, *path;
+
+	/* Start of extracting host and path */
+	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret;	
+	/* URL will split into hostname and path. */
+	// The sequence matters 
+	SET_FIRST_CUT("https://www.");
+	SET_FIRST_CUT("http://www.");
+	SET_FIRST_CUT("www.");
+
+	for (sz = iUrl; *sz; ) ++sz; 
+
+	/*printf("iUrl:%s\noffset %d\ncutSZ:%d\n", iUrl, offset, cutSz);
+	printf("(sz - iUrl):%d\n", (sz - iUrl));*/
+	// If not default value means manage to find cut from above checks
+	cut = (offset != -1)
+		? str_slice_copy(iUrl, cutSz, (sz - iUrl))
+		: str_alloc_copy(iUrl);
+
+	if (cut) {		
+		printf("inside\n");
+		for (sz = cut; *sz; ) ++sz; // Use Sz to get ending of cut
+		firstSlashOffset = str_index("/", cut, 0);
+		if (firstSlashOffset != -1) {
+			host = str_slice_copy(cut, 0, firstSlashOffset); // Host slice till before '/' offset
+			path = str_slice_copy(cut, firstSlashOffset, sz - (cut)); // Host 
+		}
+		else {
+			host = str_alloc_copy(cut); // No slash means cut already is host
+			path = str_alloc_copy("/"); // If no slash treat path as /
+		}
+	}
+	else 
+		goto cleanup;
+	
+
+	fprintf(stdout, "Host:%s\nPath:%s\n", host, path);
+	if (str_eq(HDR_POST, iType, 1)) {
+		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
+		_J(HDR_HOST" www.")_J(host)_J(FLD_ENDLN)
+		if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
+		ret = 1;
+	} else if (str_eq("GET", iType, 1)) {
+		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_ENDLN)
+		_J(HDR_HOST" www.")_J(host)_J(FLD_FINISH) 
+		ret = 1;
+	}
+
+	
+cleanup:
+#undef _J
+#undef FLD_FINISH
+#undef FLD_ENDLN
+#undef SET_FIRST_CUT
+	
+if (host) free(host);
+if (path) free(path);
+if (cut) free(cut);
+	return ret;
+}
+
+
+char *createReq(char type[], char url[],char para[]) {
+	char *path = "";
+	char *host = "";
+	char *tempurl = "";
 	memcpy(tempurl, url, strlen(url) + 1);
 
 	//printf("TempURL is  %s\n", tempurl);
@@ -456,13 +584,13 @@ char* createReq(char type[], char url[],char para[]) {
 
 	//printf("Host is %s and path is %s\n", host , path);
 
-	
 	if (strcmp(type,"post") == 0) {
 		//should see sth like 
 		//post / http/1.1
 		//Host: <url>
 
 		//parameter=value
+		printf("lol");
 		printf("asd");
 		char header[] = " HTTP/1.1\r\nHost: ";
 		strcat(request, type);
@@ -479,7 +607,6 @@ char* createReq(char type[], char url[],char para[]) {
 		//should see sth like 
 		//Get /<webpage>?parameter=value http/1.1
 		//Host: <url>
-		printf("lol");
 		char header[] = " HTTP/1.1\r\nHost: ";
 		strcat(request, type);
 		strcat(request, " /");
@@ -491,7 +618,7 @@ char* createReq(char type[], char url[],char para[]) {
 		strcat(request, "\r\n\r\n");
 		
 		//return request;
-	}
-
-	
+	}	
 }
+
+

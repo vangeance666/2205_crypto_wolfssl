@@ -1,9 +1,0 @@
-﻿  testsuite.c
-  test.c
-  server.c
-  echoserver.c
-  echoclient.c
-  client.c
-  Generating Code...
-  testsuite.vcxproj -> C:\Users\User\Desktop\wolfssl\Debug\testsuite.exe
-  testsuite.vcxproj -> C:\Users\User\Desktop\wolfssl\Debug\testsuite.pdb (Full PDB)
