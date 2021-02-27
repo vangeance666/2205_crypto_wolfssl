@@ -109,7 +109,8 @@ int main(int argc, char **argv)
 
 	char request[1000];
 	memset(request, 0, sizeof(request)); 
-	build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
+	//build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
+	build_msg_header("POST", "youtube.com/results", "search_query=ihate+school&test1=gogo&test2=fa", request); fprintf(stdout, "%s", request); // Works
 	//build_msg_header("GET", "reddit.com", 0, request); fprintf(stdout, "%s\n", request); // Works
 
 
@@ -129,8 +130,9 @@ int main(int argc, char **argv)
 	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));*/
 	//printf(YT_GET);
 
+	//printf("%s\n", request);
 
-	ret = start_session(request, "youtube.com", HTTPS_PORT, saveResponseToFile);
+	//ret = start_session(request, "youtube.com", HTTPS_PORT, saveResponseToFile);
 
 	//checks if input exist, kind of 
 	if (argc > 2) {
@@ -402,12 +404,9 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 	// Send Message over
 
 
-
 	(void)ClientWrite(ssl, zmsg, strlen(zmsg), "", 1);
 
 	int checkFinish = -1;
-	
-
 	
 	int s = 0;
 	do {
@@ -435,39 +434,6 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 	//printf("Ispending:%d\n", wolfSSL_pending(ssl));
 
 	
-
-	//printf("First Client read:\n%s\n", outMsg);
-
-	
-	
-		
-	// Learnt the library already. Now trying to apply what i have learnt to 
-	// Self Read without the wolfssl function LOL
-	//printf("After read Pending bytes: %d\n", wolfSSL_pending(ssl));
-
-	//wolfSSL_read(ssl, outMsg, outMsgSz);
-	
-	/*if (wolfSSL_pending(ssl) > 0) {
-		printf("Ispending\n");
-		wolfSSL_peek(ssl, outMsg, outMsgSz);
-	}*/
-		
-
-	
-	/*while (wolfSSL_pending(ssl) > 0) {
-		
-	}*/
-
-	//// Store received buffer into buffer
-	//for (i = 1; i; i = ClientRead(ssl,
-	//		outMsg,
-	//		outMsgSz - 1,
-	//		1,
-	//		"",
-	//		1,
-	//		saveResponse)
-	//	);
-
 
 socket_cleanup:
 	CloseSocket(sockfd);
@@ -515,7 +481,7 @@ static int start_session(const char *zmsg, const char *host, word16 port, int sa
 	/* End of init Session*/
 	
 	// Set to always verify peer, will goto callback no matter what. (Uncomment once needed)
-	//wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, myVerify);
+	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, 0);
 
 	// This one will affect  wolfSSL_pending's evaluation. Buffer size if 10000 it wont work idkwhy
 	char serverResponse[10000]; 
@@ -535,8 +501,6 @@ static int start_session(const char *zmsg, const char *host, word16 port, int sa
 		retCode = new_session(ctx, zmsg, host, port, serverResponse,
 			sizeof(serverResponse), 0);
 	
-	
-
 	//printf("serverResponse: \n%s\n", serverResponse);
 		
 file_cleanup:
@@ -564,8 +528,8 @@ cutSz = sizeof(X) - 1; \
 	}
 
 	size_t i; 
-	const char *sz, *cut, *host, *path;
-
+	const char *sz, *cut, *host, *path, *p;
+	char buf[BUFFER_SIZE] = "";
 	/* Start of extracting host and path */
 	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret;	
 	
@@ -584,7 +548,6 @@ cutSz = sizeof(X) - 1; \
 
 	/* URL will split into hostname and path. */
 	if (cut) {		
-		printf("inside\n");
 		for (sz = cut; *sz; ) ++sz; // Use Sz to get ending of cut
 		firstSlashOffset = str_index("/", cut, 0);
 		if (firstSlashOffset != -1) {
@@ -600,11 +563,25 @@ cutSz = sizeof(X) - 1; \
 		goto cleanup;
 	/* End of parsing hostname and path */
 	
-	fprintf(stdout, "Host:%s\nPath:%s\n", host, path);
 	if (str_eq(HDR_POST, iType, 1)) {
+		if (args) {
+			int beforeIndex = 0, curIndex = 0;
+			// Self parse, strcat buggy cant seem to work
+			for (p = args; *p; ++p) {
+				if (*p == '&') {
+					for (i = beforeIndex; i < (p - args); )
+						buf[curIndex++] = args[i++];
+					buf[curIndex++] = '\r';
+					buf[curIndex++] = '\n';
+					beforeIndex = (p - args) + 1;
+				}
+			} for (i = beforeIndex; i < (p - args); buf[curIndex++] = args[i++]);				
+		}
+		// Start forming the request
 		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
 		_J(HDR_HOST" www.")_J(host)_J(FLD_ENDLN)
-		if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
+		if (args) { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
+		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
 	} else if (str_eq("GET", iType, 1)) {
 		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_ENDLN)
