@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <time.h>
 
+#include "getopt.h"
+
 #include <curl/curl.h>
 // Makes all SSL header to include our defined settings user_settings.h
 #define WOLFSSL_USER_SETTINGS 
@@ -109,7 +111,7 @@ int main(int argc, char **argv)
 
 	char request[1000];
 	memset(request, 0, sizeof(request)); 
-	build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
+	//build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
 	//build_msg_header("GET", "reddit.com", 0, request); fprintf(stdout, "%s\n", request); // Works
 
 
@@ -129,23 +131,48 @@ int main(int argc, char **argv)
 	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));*/
 	//printf(YT_GET);
 
+	
+	int opt;
 
-	ret = start_session(request, "youtube.com", HTTPS_PORT, saveResponseToFile);
+ 
+	while ((opt = getopt(argc, argv, "qwe :")) != -1)//match "qwe " to case condition
+	{
+		switch (opt)
+		{
+		case 'q':
+			printf("Mode 1"); //insert verify function here
+			break;
+		case 'w':
+			printf("Mode 2"); //insert print cert details here
+			break;
+		case 'e':
+			printf("Mode 3"); //insert GET/POST function here
+			break;
+		case ':':
+			printf("option needs a value\n");
+			break;
+		case '?' :
+			printf("unknown option : %c\n", optopt);
+			break;
+		}
+	}
+
+	//ret = start_session(request, "youtube.com", HTTPS_PORT, saveResponseToFile);
 
 	//checks if input exist, kind of 
-	if (argc > 2) {
-		//type = argv[1]; //GET or POST
-		//url = argv[2];	//<url>/<path1>/<path2>
-		//para = argv[3]; //parameter=value
-		//printf("type = %s , url = %s , para = %s \n",type,url,para);
-		//create request, scroll all the way down to see function
-		
+	//if (argc > 2) {
+	//	//type = argv[1]; //GET or POST
+	//	//url = argv[2];	//<url>/<path1>/<path2>
+	//	//para = argv[3]; //parameter=value
+	//	//printf("type = %s , url = %s , para = %s \n",type,url,para);
+	//	//create request, scroll all the way down to see function
+	//	
 
-		//printf("Request: %s\n", request);
+	//	//printf("Request: %s\n", request);
 
-		//query request?
-		//ret = start_session(request, url, HTTPS_PORT);
-	}
+	//	//query request?
+	//	//ret = start_session(request, url, HTTPS_PORT);
+	//}
 	
 	/////////////////
 	//Usage for seeing message across.
