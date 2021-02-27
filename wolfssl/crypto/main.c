@@ -31,6 +31,7 @@
 #include "requests.h"
 #include "verify.h"
 #include "junkstobedeleted.h" //Delete once everything sui
+#include "argparse.h"
 
 #define BUFFER_SIZE 2048
 
@@ -38,6 +39,7 @@
 
 #define CLI_MSG_SZ      32
 #define CLI_REPLY_SZ    256
+#define URL_LEN 2048
 
 #define crlPemDir "../../certs/crl"
 
@@ -74,6 +76,7 @@ typedef enum {
 	SES_SUCESS,
 	SES_WOLF_INIT_FAIL,
 	SES_CTX_FAIL,
+	SES_EXTRACT_HOSTNAME_FAIL,
 	SES_SSL_FAIL,
 	SES_CA_LOAD_FAIL,
 	SES_SOCKET_FAIL,
@@ -84,151 +87,158 @@ typedef enum {
 	SES_RESP_BAD_SAVE_FILE
 } ses_ret_t;
 
+enum {
+	MODE_DEFAULT,
+	MODE_VERIFY_MANUAL,
+	MODE_PRINT_CERT_DETAILS,
+	MODE_SEND_MSG,
+	
+	MSG_POST,
+	MSG_GET
+};
+
 static char request[] = "";
 char *createReq(char type[], char url[], char para[]);
-
+static int cert_show_details(const char *certPath);
 static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer);
+
+static int printPeerCert = 0;
+static void print_help();
 
 int main(int argc, char **argv)
 {
+	int ret, saveResponseToFile = 1;
 
-	//char *cut;
-	//cut = str_slice_copy(fullStr, 5, 10); // Will extract 5 to 9
-	//int i;
+	char	*host;
 
-	//printf("CUT: %s\n", cut);
+	char	*msgParams;
+	int		msgType;
+	char	*certFile;
 
-	//free(cut);
+	char	caCert[MAX_PATH];
+	char	vrfCert[MAX_PATH];
+	char	request[BUFFER_SIZE];
+	char	saveRequestPath[MAX_PATH] = RESPONSE_FILE;
+	
 
-
-
-	int ret;
-	int saveResponseToFile = 1;
-	//char input[MAX_INPUT];
-	const char *type = NULL;
-	const char *url = NULL;
-	const char *para = "";
-
-	char request[1000];
-	memset(request, 0, sizeof(request)); 
-	//build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
-
-	build_msg_header("POST", "youtube.com/results", "search_query=ihate+school&test1=gogo&test2=fa", request); fprintf(stdout, "%s", request); // Works
+	//build_msg_header("POST", "youtube.com/results", "search_query=ihate+school&test1=gogo&test2=fa", request); fprintf(stdout, "%s", request); // Works
 
 	//build_msg_header("GET", "reddit.com", 0, request); fprintf(stdout, "%s\n", request); // Works
-
-
-	/*build_msg_header("POST", "www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("POST", "https://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("POST", "http://www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "https://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("POST", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
-	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));*/
-	//printf(YT_GET);
-
-
 	
-	int opt;
+	int opt, mode;
+ //
 
- 
-	while ((opt = getopt(argc, argv, "qwe :")) != -1)//match "qwe " to case condition
-	{
+	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s;")) != -1) {
 		switch (opt)
 		{
-		case 'q':
-			printf("Mode 1"); //insert verify function here
-			break;
-		case 'w':
-			printf("Mode 2"); //insert print cert details here
-			break;
-		case 'e':
-			printf("Mode 3"); //insert GET/POST function here
-			break;
-		case ':':
-			printf("option needs a value\n");
-			break;
-		case '?' :
-			printf("unknown option : %c\n", optopt);
-			break;
+			case 'v': // If verify cert manual mode, make sure that '1' and '2' is provided
+				fprintf(stdout, "MODE_VERIFY_MANUAL\n");
+				mode = MODE_VERIFY_MANUAL;
+				break;
+			case 'p':
+				mode = MODE_PRINT_CERT_DETAILS;
+				certFile = myoptarg;
+				break;
+			case 'h':
+				mode = MODE_SEND_MSG;
+				host = myoptarg;
+				break;
+			case 'P':
+				msgType = MSG_POST;
+				msgParams = (myoptarg == "") ? 0 : myoptarg;
+				break;
+			case 'G':
+				msgType = MSG_GET;
+				msgParams = (myoptarg == "") ? 0 : myoptarg;
+				break;
+			case 'C':
+				fprintf(stdout, "myoptarg:%s\n", myoptarg);
+				strcpy(caCert, myoptarg);
+				//caCert = myoptarg;
+				break;
+			case 'V':
+				fprintf(stdout, "myoptarg:%s\n", myoptarg);
+				strcpy(vrfCert, myoptarg);
+				break;
+			case 's':
+				strcpy(saveRequestPath, myoptarg);
+				break;
+			case '?':
+				print_help();
+				break;
+			default:
+				print_help();
 		}
 	}
+	////////	
+	switch (mode) {
+		// Done Tested using youtube root and intermediate
+		case MODE_VERIFY_MANUAL:
+			if (caCert && vrfCert) {
+				if (!cert_manual_verify(caCert, vrfCert)) {
+					eprintf("Failed to verify vrfCert using caCert", finish);
+				} else 
+					fprintf(stdout, "Verification of vrfCert using caCert is successful.\n");				
+			} else
+				eprintf("CACert and server cert to verify not provided.\n", finish);
+			break;
 
+		//Done tested against 
+		case MODE_PRINT_CERT_DETAILS:
+			if (certFile) {
+				if (!cert_show_details(certFile))
+					eprintf("Failed to show certfile.\n", finish);				
+			} else 
+				eprintf("Invalid cert path.\n", finish);
+			break;
 
-	//ret = start_session(request, "youtube.com", HTTPS_PORT, saveResponseToFile);
+		// Done tested with GET post havent 
+		case MODE_SEND_MSG:
+			// If user never state save response file path then use our default.
+			
+			printf("saveRequestPath: %s\n", saveRequestPath);
+			if (msgType == MSG_POST) {
+				memset(request, 0, sizeof(request));
+				build_msg_header("POST",
+					host, 
+					msgParams,
+					request);
 
-	//checks if input exist, kind of 
-	//if (argc > 2) {
-	//	//type = argv[1]; //GET or POST
-	//	//url = argv[2];	//<url>/<path1>/<path2>
-	//	//para = argv[3]; //parameter=value
-	//	//printf("type = %s , url = %s , para = %s \n",type,url,para);
-	//	//create request, scroll all the way down to see function
-	//	
-
-	//	//printf("Request: %s\n", request);
-
-	//	//query request?
-	//	//ret = start_session(request, url, HTTPS_PORT);
-	//}
-	
-	/////////////////
-	//Usage for seeing message across.
-	/*ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
-
-	// Usage for seeing message across.
-	ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
-	//ret = start_session(REDDIT_GET, "reddit.com", HTTPS_PORT);
-
-	//test_crl();
-	//start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
-	//cert_show_details(ENC_RSA, YT_ROOT);
-
-	test_crl();
-	start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
-	cert_show_details(ENC_RSA, YT_ROOT);*/
-
-	//print_help();
-	//int end = 0;
-	//
-	//printf("\n\n");
-	//printf("Input ur choice: ");
-
-	//fgets(input, MAX_INPUT, stdin);
-
-	///* Can modify program to be like arg parser but thats for later. */
-
-	//if (_IS("1"))	// 1. View Youtube cert publickey info.
-	//	cert_show_details(YT_ROOT);
-	//if (_IS("2"))	//2. View Reddit cert publickey info.
-	//	cert_show_details(REDDIT_ROOT);
-
-	//if (_IS("3"))	//3. Youtube certs verification.
-	//	if ((ret = cert_manual_verify(YT_ROOT, YT_MID))) fprintf(stdout, "Return Code: %d\n", ret);
-	//if (_IS("4"))	//4. Reddit cert verifications.
-	//	if ((ret = cert_manual_verify(REDDIT_MID, REDDIT_SERV))) fprintf(stdout, "Return Code: %d\n", ret);
+				fprintf(stdout, "%s\n", request); 
+			} else if (msgType == MSG_GET) {
+				memset(request, 0, sizeof(request));
+				build_msg_header("GET",
+					host,
+					msgParams,
+					request);
+				fprintf(stdout, "%s\n", request);
+			} else {
+				goto finish;
+			}
+			
+			start_session(request,
+				host,
+				HTTPS_PORT,
+				(saveRequestPath == "")
+				? 0 : saveRequestPath);
+			break;
+	}
 
 finish:
 	return ret;
 }
 
 static void print_help() {
-	printf("Please select the following choices: \n");
-	//printf("-------- Viewing Website certifications --------");
-	printf("1. View Youtube cert publickey info.\n");
-	printf("2. View Reddit cert publickey info.\n");
-	//printf("-------- Verification of CA Certs --------");
-	printf("3. Youtube certs verification.\n");
-	printf("4. Reddit cert verifications.\n");
-	//printf("-------- Write GET request to sites --------");
-
+	fprintf(stdout,
+		"-v\t\tVerify cert manual mode (using CertManager), please specify -C and -V certs. \n"
+		"-p <path>\tLoads cert from <path> and display key details (With M & E inclusive)\n"
+		"-h <hostname>	Host to connect to, for e.g. youtube.com\n"
+		"-G <params>	Sends GET crafted message from params. For example sch=sit&name=luliming. Concat with '&' symbol.\n"
+		"-P <params>	Sends POST crafted message from params. For example sch=sit&name=luliming. Concat with '&' symbol.\n"
+		"-C <path> 	CA cert file <path> to verify intermediate cert.\n"
+		"-V <path>	Intermediate cert file <path> to be verified by CA cert specified.\n"
+		"-s <path>	File path of where server's response using GET/POST will be saved into.\n"
+	);
 }
 
 static void print_boarder(const char *c) {
@@ -267,11 +277,9 @@ static int cert_show_details(const char *certPath) {
 	int suc;
 	WOLFSSL_X509 *cert = (WOLFSSL_X509*)wolfSSL_Malloc(DYNAMIC_TYPE_X509);	
 
-	// 1 Load cert from file
-	if ((cert = wolfSSL_X509_load_certificate_file(certPath, SSL_FILETYPE_PEM)) == NULL){
+	if ((cert = wolfSSL_X509_load_certificate_file(certPath, SSL_FILETYPE_PEM)) == NULL)
 		eprintf("Unable to load cert file to memory.\n", cleanup);
-	}
-
+	
 	suc = print_cert_details(cert);	
 
 cleanup:	
@@ -298,6 +306,7 @@ static int build_addr(SOCKADDR_IN_T *addr, const char *peer, word16 port) {
 	int res;	
 	WSADATA wsaData;
 	struct hostent *entry;
+	char *lookupName;
 
 	//For windows this one is required for gethostbyname to work
 	if ((res = WSAStartup(MAKEWORD(2, 2), &wsaData)) != NULL) 
@@ -306,6 +315,7 @@ static int build_addr(SOCKADDR_IN_T *addr, const char *peer, word16 port) {
 	// Make it all null first
 	XMEMSET(addr, 0, sizeof(SOCKADDR_IN_T));
 
+	
 	entry = gethostbyname(peer);
 	//Set IP address to first IP using lookup
 	if (entry) {
@@ -397,6 +407,7 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 
 	SOCKET_T	sockfd;
 
+	printf("hostname:%s\nmsg:%s\n", hostname, zmsg);
 	tcpRet = tcp_connect(&sockfd, hostname, port, ssl);
 
 	if (tcpRet != TCP_SUCESS) {
@@ -431,39 +442,16 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 		retCode = SES_HANDSHAKE_FAIL;
 		eprintf("TCP Handshake fail", socket_cleanup);
 	} 
-	// Send Message over
-
-
-	(void)ClientWrite(ssl, zmsg, strlen(zmsg), "", 1);
-
-	int checkFinish = -1;
 	
-	int s = 0;
+	(void)client_write(ssl, zmsg, strlen(zmsg), "", 1);
+
+	int isFinished = 0;
 	do {
-		printf("checkFinish:%d\n", checkFinish);
-		if ((err = ClientRead(ssl, outMsg, outMsgSz, 1, &checkFinish, saveFilePtr)) != 0) {
+		if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &isFinished, saveFilePtr)) != 0) {
 			retCode = SES_READ_RESP_FAIL;
 			eprintf("Encoutnered error when conducting wolfSSL_read()", socket_cleanup);
 		}
-		//printf("s: %d\n", s);
-		++s;
-	} while (checkFinish != 1);
-	printf("out already ------ checkFinish:%d\n", checkFinish);
-	
-	/*if (saveFilePtr) printf("havefile\n");
-	
-
-	//for (i = 0; i < outMsgSz; ++i) {
-	//	printf("%c", outMsg[i]);
-	//}
-
-	//fprintf(stdout, "Finished all:\n\n%s\n", outMsg);
-	/*printf("Peek:%d\n", wolfSSL_peek(ssl, outMsg, outMsgSz));*/
-
-	
-	//printf("Ispending:%d\n", wolfSSL_pending(ssl));
-
-	
+	} while (!isFinished);
 
 socket_cleanup:
 	CloseSocket(sockfd);
@@ -485,7 +473,7 @@ finish:
  * @param  port Port number to connect using socket
  * @return      Session Enum Code <ses_ret_t>
  */
-static int start_session(const char *zmsg, const char *host, word16 port, int saveResponse) {
+static int start_session(const char *zmsg, const char *url, word16 port, const char *savePath) {
 
 	ses_ret_t retCode;
 
@@ -494,8 +482,10 @@ static int start_session(const char *zmsg, const char *host, word16 port, int sa
 		eprintf("WolfSSL_Init failed", wolf_cleanup);
 	}
 			
-	WOLFSSL_CTX		*ctx;
+	WOLFSSL_CTX *ctx;
 	FILE *saveResponseFile;
+
+	char serverResponse[CLI_REPLY_SZ], hostName[URL_LEN]; 
 	
 	/* Init Session */
 	if ((ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
@@ -511,15 +501,21 @@ static int start_session(const char *zmsg, const char *host, word16 port, int sa
 	/* End of init Session*/
 	
 	// Set to always verify peer, will goto callback no matter what. (Uncomment once needed)
-	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, 0);
+	//wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, printPeerCert ? myVerify : 0);
 
-	// This one will affect  wolfSSL_pending's evaluation. Buffer size if 10000 it wont work idkwhy
-	char serverResponse[10000]; 
-	if (saveResponse) {
-		saveResponseFile = fopen(RESPONSE_FILE, "w");
+	printf("savepath:%s\n", savePath);
+	if (!get_hostname_from_url(url, hostName)) {
+		retCode = SES_EXTRACT_HOSTNAME_FAIL;
+		eprintf("Unable to get hostname from full url path", ctx_cleanup);
+	}
+	
+
+
+	if (savePath) {
+		saveResponseFile = fopen(savePath, "w");
 		if (saveResponseFile) {
 			/* Start one one session */
-			retCode = new_session(ctx, zmsg, host, port, serverResponse,
+			retCode = new_session(ctx, zmsg, hostName, port, serverResponse,
 				sizeof(serverResponse), saveResponseFile);
 			/* End of one session */
 
@@ -528,7 +524,7 @@ static int start_session(const char *zmsg, const char *host, word16 port, int sa
 			eprintf("Unable to open save file", file_cleanup);
 		}		
 	} else 
-		retCode = new_session(ctx, zmsg, host, port, serverResponse,
+		retCode = new_session(ctx, zmsg, hostName, port, serverResponse,
 			sizeof(serverResponse), 0);
 	
 	//printf("serverResponse: \n%s\n", serverResponse);
@@ -541,6 +537,47 @@ wolf_cleanup:
 	wolfSSL_Cleanup();
 finish:
 	return retCode;
+}
+
+static int get_hostname_from_url(const char *url, char *outHost) {
+#define GET_FIRST_INDEX(A, B, C, X) \
+if (A == -1) { \
+	A = str_index(X, C, 1); \
+	B = sizeof(X) - 1; \
+}
+
+	if (!url || !outHost)
+		return 0;
+
+	printf("url %s\n", url);
+	//printf("hostname %s\n", hostname);
+
+	int length = 0, found = -1, firstIndex = 0, i = -1;
+	const char *sz, *p = url, *h, *stop;
+	//get_hostname_from_url("https://www.youtube.com/results/yolo", testOut);
+
+	GET_FIRST_INDEX(found, firstIndex, url, "https://www.")
+	GET_FIRST_INDEX(found, firstIndex, url, "http://www.");
+	GET_FIRST_INDEX(found, firstIndex, url, "www.");
+
+	printf("firstoffset:%d\n", found);
+	if (found == 0)
+		p += firstIndex;
+
+	printf("first p:%c\n", *p);
+
+	for (; *p; ++p) {
+		if (*p == '/' || *p == '\\') {
+			break;
+		} else {
+			*outHost = *p;
+			++outHost;
+		}
+	} *outHost = 0;
+
+#undef SET_FIRST_OFFSET
+
+	return 1;
 }
 
 static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer) {
@@ -594,7 +631,7 @@ cutSz = sizeof(X) - 1; \
 	/* End of parsing hostname and path */
 	
 	if (str_eq(HDR_POST, iType, 1)) {
-		if (args) {
+		if (args && args != "") {
 			int beforeIndex = 0, curIndex = 0;
 			// Self parse, strcat buggy cant seem to work
 			for (p = args; *p; ++p) {
@@ -610,7 +647,7 @@ cutSz = sizeof(X) - 1; \
 		// Start forming the request
 		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
 		_J(HDR_HOST" www.")_J(host)_J(FLD_ENDLN)
-		if (args) { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
+		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
 	} else if (str_eq("GET", iType, 1)) {

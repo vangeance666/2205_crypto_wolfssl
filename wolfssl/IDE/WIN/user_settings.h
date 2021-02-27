@@ -12,6 +12,7 @@
 #define HAVE_OCSP
 #define HAVE_CERTIFICATE_STATUS_REQUEST
 #define HAVE_CERTIFICATE_STATUS_REQUEST_V2
+#define HAVE_TLS_EXTENSIONS
 
 /* Verify this is Windows */
 #ifndef _WIN32

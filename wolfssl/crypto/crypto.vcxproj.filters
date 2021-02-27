@@ -44,5 +44,8 @@
     <ClInclude Include="junkstobedeleted.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="argparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 #ifndef requests_h
 #define requests_h
 
+#include <wolfssl\internal.h>
+
 typedef enum {
 	WRITE_OK,
 	WRITE_FAIL,
@@ -13,24 +15,22 @@ typedef enum {
 } read_ret_t;
 
 /** WolfSSL's helper function to read server response */
-static int ClientRead(WOLFSSL *ssl, char *reply, 
-	int replyLen, int exitWithRet, int *checkFinish, FILE *fPtr) {
+static int client_read(WOLFSSL *ssl, char *reply, 
+	int replyLen, int exitWithRet, int *setFinish, FILE *fPtr) {
 
 	int ret, err;
 	char buffer[WOLFSSL_MAX_ERROR_SZ];
 
 	time_t start, end; time(&start);
 
-
 	do {
 		err = 0; /* reset error */
 		ret = wolfSSL_read(ssl, reply, replyLen);
 		err = wolfSSL_get_error(ssl, 0);
 
-		if (ret <= 0) {
-						
+		if (ret <= 0) {				
 			if (err != WOLFSSL_ERROR_WANT_READ) {
-				*checkFinish = 1;
+				*setFinish = 1;
 				break;
 				//printf("SSL_read reply error %d, %s\n", err,
 				//	wolfSSL_ERR_error_string(err, buffer));
@@ -40,7 +40,6 @@ static int ClientRead(WOLFSSL *ssl, char *reply,
 				//	break;
 			}
 		}
-
 		if (err == WOLFSSL_ERROR_WANT_READ) {
 			time(&end);
 			if (difftime(start, end) > 5) {//MAX_NON_BLOCK_SEC
@@ -51,11 +50,7 @@ static int ClientRead(WOLFSSL *ssl, char *reply,
 		}
 		
 	} while ((err == WOLFSSL_ERROR_WANT_READ));
-	//Original from wolfssl
-
-
 	//*checkFinish = ret;
-
 
 	if (ret > 0) 
 		reply[ret] = 0; /* null terminate */
@@ -68,31 +63,24 @@ static int ClientRead(WOLFSSL *ssl, char *reply,
 			fprintf(fPtr, "%s", reply);
 		}
 	}
-
+	//*checkFinish = 1;
 	// For identify by html. If no html tag die.
-	*checkFinish = (strstr(reply, "</html>") != NULL);
+	if ((strstr(reply, "</html>") != NULL)) {
+		printf("found end html tag\n");
+		*setFinish = 1;
+	}
+	//printf("ssl->buffers.clearOutputBuffer.length: %d\n", (int)ssl->buffers.clearOutputBuffer.length);
+	//printf("ssl->buffers.outputBuffer.length: %d\n", (int)ssl->buffers.outputBuffer.length);
+	//printf("ssl->buffers.inputBuffer.length: %d\n", (int)ssl->buffers.inputBuffer.length);
 
-	//////////////// 
-	//while (ret > 0) {
-	//	reply[ret] = 0; /* null terminate */
-	//	printf("%s%s\n", str, reply);
-
-	//	//check reply for </html>, if exist exit loop, if not continue calling from buffer
-	//	if (strstr(reply,"</html>") != NULL) {
-	//		ret = 0;
-	//		//printf("exit?");
-	//	} else {
-	//		ret = wolfSSL_read(ssl, reply, replyLen);
-	//		printf("RET == %d\n", ret);
-	//	}
-	//}
-
+	//printf("\n\n---Ret: %d-----wolfssl_peek(ssl): %d---------\n", ret, wolfSSL_peek(ssl, reply, replyLen));
+		
 	return err;
 }
 
 
 /** Helper function to write Message with GET/POST into SSL object */
-static int ClientWrite(WOLFSSL *ssl, const char *msg, int msgSz, const char *str)
+static int client_write(WOLFSSL *ssl, const char *msg, int msgSz, const char *str)
 {
 	printf("Inside ClientWrite\n");
 

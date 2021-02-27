@@ -173,25 +173,6 @@ static char *str_slice_copy(const char *s, int start, int end) {
 	return 0;
 }
 
-static char **str_split_copy(const char *s, const char delim) {
-
-	const char *p;
-	size_t i = 0; int lastPos = 0;
-	char **dd;
-
-	if (s) {
-		for (p = s; *p; ++p) {
-			if (*p == delim) {
-				dd[i++] = str_slice_copy(s, lastPos, p - s);
-				lastPos = (p - s) + 1; // Prev pos to 
-			}
-		}
-	}
-
-	return 0;
-}
-
-
 #endif
 
 

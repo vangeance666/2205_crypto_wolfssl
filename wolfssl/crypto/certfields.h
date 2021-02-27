@@ -17,9 +17,9 @@ static void show_pkey_details(WOLFSSL_X509 *cert) {
 		eprintf("Failed to retrieve public key.\n", finish)
 	}
 
-	printf("PUBLIC KEY:\n");
+	printf("PUBLIC KEY HEX:\n");
 	for (i = 0; i < pubKeyTmp->pkey_sz; ++i) {
-		printf("%02X", pubKeyTmp->pkey.ptr[i] & 0xFF);
+		printf("%02X ", pubKeyTmp->pkey.ptr[i] & 0xFF);
 	} printf("\n");
 	
 finish:

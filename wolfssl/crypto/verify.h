@@ -6,12 +6,7 @@
 static int cert_manual_verify(const char *caCert,
 	const char *vrfCert) {
 
-	// Verify locations method of verification
-	/*if ((ret = wolfSSL_CTX_load_verify_locations(ctx, chainCert, 0)) != SSL_SUCCESS) {
-	fprintf(stderr, "[Error] Failed to load cert file.\n");
-	goto finish;}
-	*/
-	int ret, suc;
+	int ret, suc = 0;
 	WOLFSSL_CERT_MANAGER *cm = NULL;
 
 	if ((cm = wolfSSL_CertManagerNew()) == NULL) {

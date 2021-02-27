@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IDE\WIN\user_settings.h" />
+    <ClInclude Include="argparse.h" />
     <ClInclude Include="callbacks.h" />
     <ClInclude Include="certfields.h" />
     <ClInclude Include="common.h" />

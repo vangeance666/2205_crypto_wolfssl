@@ -1,11 +1,11 @@
 ﻿  crl.c
   internal.c
-  wolfio.c
   keys.c
   ocsp.c
   ssl.c
   tls.c
   tls13.c
+  wolfio.c
   aes.c
   arc4.c
   asn.c
@@ -16,8 +16,8 @@
   chacha20_poly1305.c
   cmac.c
   coding.c
-  curve25519.c
   cpuid.c
+  curve25519.c
   Compiling...
   des3.c
   dh.c
@@ -38,9 +38,9 @@
   md4.c
   md5.c
   memory.c
-  pkcs7.c
-  Compiling...
   pkcs12.c
+  Compiling...
+  pkcs7.c
   poly1305.c
   pwdbased.c
   rabbit.c
@@ -63,6 +63,6 @@
   Compiling...
   wc_pkcs11.c
   wc_port.c
-  wolfmath.c
   wolfevent.c
+  wolfmath.c
   wolfssl.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\wolfssl.lib
