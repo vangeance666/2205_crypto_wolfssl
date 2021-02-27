@@ -1,7 +1,7 @@
 #ifndef callbacks_h
 #define callbacks_h
 
-static int myVerifyAction = VERIFY_OVERRIDE_ERROR;
+static int myVerifyAction = VERIFY_OVERRIDE_DATE_ERR;
 
 static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 {
@@ -100,8 +100,6 @@ static int myVerify(int preverify, WOLFSSL_X509_STORE_CTX *store)
 		printf("\tAllowing failed certificate check, testing only "
 			"(shouldn't do this in production)\n");
 	}
-
-	return 0;
 
 	/* A non-zero return code indicates failure override */
 	return (myVerifyAction == VERIFY_OVERRIDE_ERROR) ? 1 : preverify;

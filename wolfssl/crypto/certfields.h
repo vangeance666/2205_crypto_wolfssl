@@ -36,6 +36,7 @@ static void show_x509_bio_info(WOLFSSL_X509 *cert) {
 	}
 }
 
+
 static void show_x509_name_info(WOLFSSL_X509 *cert) {
 
 #define GN_INF(T, V) \
@@ -63,7 +64,7 @@ finish:
 }
 
 static void show_x509_info(WOLFSSL_X509 *cert) {
-	//For now only this 3 first.
+	
 	char *issuer, *subject, *altName;
 
 	subject = wolfSSL_X509_NAME_oneline(wolfSSL_X509_get_subject_name(cert), 0, 0);
@@ -78,8 +79,5 @@ clean_all:
 	XFREE(subject, 0, DYNAMIC_TYPE_OPENSSL);
 	XFREE(issuer, 0, DYNAMIC_TYPE_OPENSSL);
 }
-
-
-
 
 #endif

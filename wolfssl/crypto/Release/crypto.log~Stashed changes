@@ -1,0 +1,101 @@
+﻿  main.c
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(86): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(79): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238): note: see declaration of 'gethostbyname'
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(80): warning C4474: 'fprintf' : too many arguments passed for format string
+  c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(80): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(86): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1868): note: see declaration of 'inet_ntoa'
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(71): warning C4101: 'wsaData': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(101): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(111): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(97): warning C4101: 'i': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(156): warning C4101: 'i': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(7): warning C4013: 'print_cert_details' undefined; assuming extern returning int
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(21): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48): warning C4101: 'i': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48): warning C4101: 'suc': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48): warning C4101: 'sigType': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(48): warning C4101: 'ret': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(77): warning C4102: 'clean_all': unreferenced label
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\verify.h(38): warning C4102: 'finish': unreferenced label
+main.c(102): warning C4020: 'test_build_msg': too many actual parameters
+main.c(103): warning C4020: 'test_build_msg': too many actual parameters
+main.c(104): warning C4020: 'test_build_msg': too many actual parameters
+main.c(105): warning C4020: 'test_build_msg': too many actual parameters
+main.c(106): warning C4020: 'test_build_msg': too many actual parameters
+main.c(107): warning C4020: 'test_build_msg': too many actual parameters
+main.c(108): warning C4020: 'test_build_msg': too many actual parameters
+main.c(109): warning C4020: 'test_build_msg': too many actual parameters
+main.c(110): warning C4020: 'test_build_msg': too many actual parameters
+main.c(111): warning C4020: 'test_build_msg': too many actual parameters
+main.c(112): warning C4020: 'test_build_msg': too many actual parameters
+main.c(113): warning C4020: 'test_build_msg': too many actual parameters
+main.c(114): warning C4020: 'test_build_msg': too many actual parameters
+main.c(115): warning C4020: 'test_build_msg': too many actual parameters
+main.c(116): warning C4020: 'test_build_msg': too many actual parameters
+main.c(164): warning C4102: 'finish': unreferenced label
+main.c(226): warning C4102: 'finish': unreferenced label
+main.c(250): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+main.c(262): warning C4090: 'function': different 'const' qualifiers
+main.c(256): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238): note: see declaration of 'gethostbyname'
+main.c(263): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
+main.c(381): warning C4020: 'ClientWrite': too many actual parameters
+main.c(392): warning C4102: 'finish': unreferenced label
+main.c(448): warning C4102: 'finish': unreferenced label
+main.c(498): warning C4101: 'r': unreferenced local variable
+main.c(504): warning C4029: declared formal parameter list different from definition
+main.c(576): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(577): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(578): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(579): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(580): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(581): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(583): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(584): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(586): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(589): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(590): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(593): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(594): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(597): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(600): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(601): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(602): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(603): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(619): warning C4090: 'function': different 'const' qualifiers
+main.c(523): warning C4101: 'a': unreferenced local variable
+main.c(521): warning C4101: 'retMsg': unreferenced local variable
+main.c(523): warning C4101: 'b': unreferenced local variable
+main.c(522): warning C4101: 'i': unreferenced local variable
+main.c(524): warning C4101: 'params': unreferenced local variable
+main.c(648): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(649): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(650): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(651): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(652): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(653): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(654): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(655): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(663): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(664): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(665): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(666): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(667): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(668): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(669): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(670): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+main.c(633): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
+  Generating code
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(165): warning C4700: uninitialized local variable 'ret' used
+  1 of 11 functions ( 9.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.exe
+  crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.pdb (Full PDB)

@@ -148,5 +148,85 @@
 //finish:
 //	return suc;
 //}
+//
+//char *createReq(char type[], char url[], char para[]) {
+//	char *path = "";
+//	char *host = "";
+//	char *tempurl = "";
+//	memcpy(tempurl, url, strlen(url) + 1);
+//
+//	//printf("TempURL is  %s\n", tempurl);
+//	host = strtok(url, "/");
+//
+//	path = getPath(tempurl, host);
+//
+//	//printf("Host is %s and path is %s\n", host , path);
+//
+//	if (strcmp(type, "post") == 0) {
+//		//should see sth like 
+//		//post / http/1.1
+//		//Host: <url>
+//
+//		//parameter=value
+//		printf("lol");
+//		printf("asd");
+//		char header[] = " HTTP/1.1\r\nHost: ";
+//		strcat(request, type);
+//		strcat(request, "/");
+//		strcat(request, path);
+//		strcat(request, " ");
+//		strcat(request, header);
+//		strcat(request, host);
+//		strcat(request, "\r\n\r\n");
+//		strcat(request, para);
+//		//return request;
+//	}
+//	else if (strcmp(type, "get") == 0) {
+//		//should see sth like 
+//		//Get /<webpage>?parameter=value http/1.1
+//		//Host: <url>
+//		char header[] = " HTTP/1.1\r\nHost: ";
+//		strcat(request, type);
+//		strcat(request, " /");
+//		strcat(request, path);
+//		strcat(request, "?");
+//		strcat(request, para);
+//		strcat(request, header);
+//		strcat(request, host);
+//		strcat(request, "\r\n\r\n");
+//
+//		//return request;
+//	}
+//	//char *getPath(char url[], char host[]) {
+	//	//printf("URL is %s and HOST is %s\n", url, host);
+	//	int i, j, ls, lw, temp, chk = 0;
+	//	ls = strlen(url);
+	//	lw = strlen(host);
+	//	for (i = 0; i < ls; i++)
+	//	{
+	//		temp = i;
+	//		for (j = 0; j < lw; j++)
+	//		{
+	//			if (url[i] == host[j])
+	//				i++;
+	//		}
+	//		chk = i - temp;
+	//		if (chk == lw)
+	//		{
+	//			i = temp;
+	//			for (j = i; j < (ls - lw); j++)
+	//				url[j] = url[j + lw];
+	//			ls = ls - lw;
+	//			url[j] = '\0';
+	//		}
+	//	}
 
+	//	//	printf("path is %s", url);
+	//	return url;
+	//}
+
+
+
+
+//}
 #endif

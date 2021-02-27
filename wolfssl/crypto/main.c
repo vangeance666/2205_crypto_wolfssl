@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <time.h>
 
+#include <curl/curl.h>
 // Makes all SSL header to include our defined settings user_settings.h
 #define WOLFSSL_USER_SETTINGS 
 
@@ -33,6 +34,9 @@
 
 #define HEADER_SIZE 8192
 
+#define CLI_MSG_SZ      32
+#define CLI_REPLY_SZ    256
+
 #define crlPemDir "../../certs/crl"
 
 #define MOZILLA_ROOT "./certs/mozilla-roots-cas.pem"
@@ -44,10 +48,12 @@
 #define HDR_POST "POST"
 #define HDR_GET "GET"
 
+#define RESPONSE_FILE "temp_server_response.txt"
+
 typedef struct sockaddr_in  SOCKADDR_IN_T;
 
 typedef enum {
-	ADDR_DEFAULT,
+	ADDR_DEFAULT = -100,
 	ADDR_SUCESS,
 	ADDR_WSA_FAIL,
 	ADDR_INVALID_ADDR_PTR,
@@ -55,14 +61,14 @@ typedef enum {
 } addr_ret_t;
 
 typedef enum {
-	TCP_DEFAULT,
+	TCP_DEFAULT = -150,
 	TCP_SUCESS,
 	TCP_ADDR_FAIL,
 	TCP_CONNECT_FAIL
 }tcp_ret_t;
 
 typedef enum {
-	SES_DEFAULT,
+	SES_DEFAULT = -200,
 	SES_SUCESS,
 	SES_WOLF_INIT_FAIL,
 	SES_CTX_FAIL,
@@ -71,7 +77,9 @@ typedef enum {
 	SES_SOCKET_FAIL,
 	SES_FD_FAIL,
 	SES_DOMAIN_CHECK_FAIL,
-	SES_HANDSHAKE_FAIL
+	SES_HANDSHAKE_FAIL,
+	SES_READ_RESP_FAIL,
+	SES_RESP_BAD_SAVE_FILE
 } ses_ret_t;
 
 static char request[] = "";
@@ -90,7 +98,10 @@ int main(int argc, char **argv)
 
 	//free(cut);
 
+
+
 	int ret;
+	int saveResponseToFile = 1;
 	//char input[MAX_INPUT];
 	const char *type = NULL;
 	const char *url = NULL;
@@ -99,6 +110,7 @@ int main(int argc, char **argv)
 	char request[1000];
 	memset(request, 0, sizeof(request)); 
 	build_msg_header("GET", "youtube.com/results", "search_query=ihate+school", request); fprintf(stdout, "%s\n", request); // Works
+	//build_msg_header("GET", "reddit.com", 0, request); fprintf(stdout, "%s\n", request); // Works
 
 
 	/*build_msg_header("POST", "www.youtube.com", "hehe=1\r\ndog=41\r\nxyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));
@@ -117,8 +129,8 @@ int main(int argc, char **argv)
 	build_msg_header("GET", "http://www.youtube.com", "hehe=1&dog=41&xyou=414", request); fprintf(stdout, "%s\n", request); memset(request, 0, sizeof(request));*/
 	//printf(YT_GET);
 
-	
-	ret = start_session(request, "www.youtube.com", HTTPS_PORT);
+
+	ret = start_session(request, "youtube.com", HTTPS_PORT, saveResponseToFile);
 
 	//checks if input exist, kind of 
 	if (argc > 2) {
@@ -134,8 +146,7 @@ int main(int argc, char **argv)
 		//query request?
 		//ret = start_session(request, url, HTTPS_PORT);
 	}
-
-
+	
 	/////////////////
 	//Usage for seeing message across.
 	/*ret = start_session(YT_GET, "youtube.com", HTTPS_PORT);
@@ -151,8 +162,6 @@ int main(int argc, char **argv)
 	test_crl();
 	start_session("youtube.com", VERIFY_OVERRIDE_DATE_ERR);
 	cert_show_details(ENC_RSA, YT_ROOT);*/
-
-
 
 	//print_help();
 	//int end = 0;
@@ -177,7 +186,6 @@ int main(int argc, char **argv)
 finish:
 	return ret;
 }
-
 
 static void print_help() {
 	printf("Please select the following choices: \n");
@@ -342,19 +350,21 @@ static int connect_handshake(WOLFSSL *ssl) {
  * @param  port     Port Number to connect using socket
  * @param  outMsg   Buffer to store server reply
  * @param  outMsgSz Buffer Size
+ * @param  saveResponse 1 to save server GET/POST Response to a local file
  * @return          Session enum status code <ses_ret_t>
  */
 static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg, 
-	const char *hostname, word16 port, char *outMsg, int outMsgSz) {
+	const char *hostname, word16 port,
+	char *outMsg, int outMsgSz, FILE *saveFilePtr) {
 
-	WOLFSSL *ssl; size_t i;
+	WOLFSSL *ssl;
+	size_t	i; int err;
 
-	tcp_ret_t tcpRet;
-	ses_ret_t retCode = SES_DEFAULT;	
+	tcp_ret_t	tcpRet;
+	ses_ret_t	retCode = SES_DEFAULT;	
 
-	SOCKET_T sockfd;
-	
-	
+	SOCKET_T	sockfd;
+
 	tcpRet = tcp_connect(&sockfd, hostname, port, ssl);
 
 	if (tcpRet != TCP_SUCESS) {
@@ -389,12 +399,74 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 		retCode = SES_HANDSHAKE_FAIL;
 		eprintf("TCP Handshake fail", socket_cleanup);
 	} 
-
 	// Send Message over
+
+
+
 	(void)ClientWrite(ssl, zmsg, strlen(zmsg), "", 1);
+
+	int checkFinish = -1;
 	
-	// Store received buffer into buffer
-	for (i = 1; i; i = ClientRead(ssl, outMsg, outMsgSz - 1, 1, "", 1));
+
+	
+	int s = 0;
+	do {
+		printf("checkFinish:%d\n", checkFinish);
+		if ((err = ClientRead(ssl, outMsg, outMsgSz, 1, &checkFinish, saveFilePtr)) != 0) {
+			retCode = SES_READ_RESP_FAIL;
+			eprintf("Encoutnered error when conducting wolfSSL_read()", socket_cleanup);
+		}
+		//printf("s: %d\n", s);
+		++s;
+	} while (checkFinish != 1);
+	printf("out already ------ checkFinish:%d\n", checkFinish);
+	
+	/*if (saveFilePtr) printf("havefile\n");
+	
+
+	//for (i = 0; i < outMsgSz; ++i) {
+	//	printf("%c", outMsg[i]);
+	//}
+
+	//fprintf(stdout, "Finished all:\n\n%s\n", outMsg);
+	/*printf("Peek:%d\n", wolfSSL_peek(ssl, outMsg, outMsgSz));*/
+
+	
+	//printf("Ispending:%d\n", wolfSSL_pending(ssl));
+
+	
+
+	//printf("First Client read:\n%s\n", outMsg);
+
+	
+	
+		
+	// Learnt the library already. Now trying to apply what i have learnt to 
+	// Self Read without the wolfssl function LOL
+	//printf("After read Pending bytes: %d\n", wolfSSL_pending(ssl));
+
+	//wolfSSL_read(ssl, outMsg, outMsgSz);
+	
+	/*if (wolfSSL_pending(ssl) > 0) {
+		printf("Ispending\n");
+		wolfSSL_peek(ssl, outMsg, outMsgSz);
+	}*/
+		
+
+	
+	/*while (wolfSSL_pending(ssl) > 0) {
+		
+	}*/
+
+	//// Store received buffer into buffer
+	//for (i = 1; i; i = ClientRead(ssl,
+	//		outMsg,
+	//		outMsgSz - 1,
+	//		1,
+	//		"",
+	//		1,
+	//		saveResponse)
+	//	);
 
 
 socket_cleanup:
@@ -417,7 +489,7 @@ finish:
  * @param  port Port number to connect using socket
  * @return      Session Enum Code <ses_ret_t>
  */
-static int start_session(const char *zmsg, const char *host, word16 port) {
+static int start_session(const char *zmsg, const char *host, word16 port, int saveResponse) {
 
 	ses_ret_t retCode;
 
@@ -427,6 +499,7 @@ static int start_session(const char *zmsg, const char *host, word16 port) {
 	}
 			
 	WOLFSSL_CTX		*ctx;
+	FILE *saveResponseFile;
 	
 	/* Init Session */
 	if ((ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
@@ -444,17 +517,30 @@ static int start_session(const char *zmsg, const char *host, word16 port) {
 	// Set to always verify peer, will goto callback no matter what. (Uncomment once needed)
 	//wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, myVerify);
 
-	char serverResponse[BUFFER_SIZE];
+	// This one will affect  wolfSSL_pending's evaluation. Buffer size if 10000 it wont work idkwhy
+	char serverResponse[10000]; 
+	if (saveResponse) {
+		saveResponseFile = fopen(RESPONSE_FILE, "w");
+		if (saveResponseFile) {
+			/* Start one one session */
+			retCode = new_session(ctx, zmsg, host, port, serverResponse,
+				sizeof(serverResponse), saveResponseFile);
+			/* End of one session */
 
-	/* Start of one session */
-	retCode = new_session(ctx, zmsg, host, port, serverResponse, sizeof(serverResponse));
-	/* End of one session */
-
-	printf("serverResponse: \n%s\n", serverResponse);
-	free(serverResponse);
-	// Multiple rounds 
+		} else {
+			retCode = SES_RESP_BAD_SAVE_FILE;
+			eprintf("Unable to open save file", file_cleanup);
+		}		
+	} else 
+		retCode = new_session(ctx, zmsg, host, port, serverResponse,
+			sizeof(serverResponse), 0);
+	
 	
 
+	//printf("serverResponse: \n%s\n", serverResponse);
+		
+file_cleanup:
+	if (saveResponseFile) fclose(saveResponseFile);
 ctx_cleanup:
 	wolfSSL_CTX_free(ctx);
 wolf_cleanup:
@@ -463,43 +549,12 @@ finish:
 	return retCode;
 }
 
-char *getPath(char url[], char host[]) {
-	//printf("URL is %s and HOST is %s\n", url, host);
-	int i, j, ls, lw, temp, chk = 0;
-	ls = strlen(url);
-	lw = strlen(host);
-	for (i = 0; i < ls; i++)
-	{
-		temp = i;
-		for (j = 0; j < lw; j++)
-		{
-			if (url[i] == host[j])
-				i++;
-		}
-		chk = i - temp;
-		if (chk == lw)
-		{
-			i = temp;
-			for (j = i; j < (ls - lw); j++)
-				url[j] = url[j + lw];
-			ls = ls - lw;
-			url[j] = '\0';
-		}
-	}
-
-//	printf("path is %s", url);
-	return url;
-}
-
-
-
 static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer) {
 #define SET_FIRST_CUT(X) \
 if (offset == -1) { \
 offset = str_index(X, iUrl, 1); \
 cutSz = sizeof(X) - 1; \
-}
-	
+}	
 #define _J(X) strcat(outBuffer, X);
 
 	// Check if is not empty
@@ -513,8 +568,7 @@ cutSz = sizeof(X) - 1; \
 
 	/* Start of extracting host and path */
 	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret;	
-	/* URL will split into hostname and path. */
-	// The sequence matters 
+	
 	SET_FIRST_CUT("https://www.");
 	SET_FIRST_CUT("http://www.");
 	SET_FIRST_CUT("www.");
@@ -528,6 +582,7 @@ cutSz = sizeof(X) - 1; \
 		? str_slice_copy(iUrl, cutSz, (sz - iUrl))
 		: str_alloc_copy(iUrl);
 
+	/* URL will split into hostname and path. */
 	if (cut) {		
 		printf("inside\n");
 		for (sz = cut; *sz; ) ++sz; // Use Sz to get ending of cut
@@ -543,8 +598,8 @@ cutSz = sizeof(X) - 1; \
 	}
 	else 
 		goto cleanup;
+	/* End of parsing hostname and path */
 	
-
 	fprintf(stdout, "Host:%s\nPath:%s\n", host, path);
 	if (str_eq(HDR_POST, iType, 1)) {
 		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
@@ -556,7 +611,6 @@ cutSz = sizeof(X) - 1; \
 		_J(HDR_HOST" www.")_J(host)_J(FLD_FINISH) 
 		ret = 1;
 	}
-
 	
 cleanup:
 #undef _J
@@ -567,58 +621,11 @@ cleanup:
 if (host) free(host);
 if (path) free(path);
 if (cut) free(cut);
+
 	return ret;
 }
 
 
-char *createReq(char type[], char url[],char para[]) {
-	char *path = "";
-	char *host = "";
-	char *tempurl = "";
-	memcpy(tempurl, url, strlen(url) + 1);
 
-	//printf("TempURL is  %s\n", tempurl);
-	host = strtok(url, "/");
-
-	path = getPath(tempurl, host);
-
-	//printf("Host is %s and path is %s\n", host , path);
-
-	if (strcmp(type,"post") == 0) {
-		//should see sth like 
-		//post / http/1.1
-		//Host: <url>
-
-		//parameter=value
-		printf("lol");
-		printf("asd");
-		char header[] = " HTTP/1.1\r\nHost: ";
-		strcat(request, type);
-		strcat(request, "/");
-		strcat(request, path);
-		strcat(request, " ");
-		strcat(request, header);
-		strcat(request, host);
-		strcat(request, "\r\n\r\n");
-		strcat(request, para);
-		//return request;
-	}
-	else if (strcmp(type, "get") == 0) {
-		//should see sth like 
-		//Get /<webpage>?parameter=value http/1.1
-		//Host: <url>
-		char header[] = " HTTP/1.1\r\nHost: ";
-		strcat(request, type);
-		strcat(request, " /");
-		strcat(request, path);
-		strcat(request, "?");
-		strcat(request, para);
-		strcat(request, header);
-		strcat(request, host);
-		strcat(request, "\r\n\r\n");
-		
-		//return request;
-	}	
-}
 
 

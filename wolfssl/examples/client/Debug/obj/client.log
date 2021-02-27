@@ -1,0 +1,25 @@
+﻿cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  client.c
+D:\2205\2205_crypto_wolfssl\wolfssl\examples\client\client.c(21,1): warning C4005: 'WOLFSSL_USER_SETTINGS': macro redefinition
+D:\2205\2205_crypto_wolfssl\wolfssl\examples\client\client.c : message : see previous definition of 'WOLFSSL_USER_SETTINGS'
+D:\2205\2205_crypto_wolfssl\wolfssl\examples\client\client.c(3476,9): warning C4473: 'printf' : not enough arguments passed for format string
+D:\2205\2205_crypto_wolfssl\wolfssl\examples\client\client.c(3476,9): message : placeholders and their parameters expect 1 variadic arguments, but 0 were provided
+D:\2205\2205_crypto_wolfssl\wolfssl\examples\client\client.c(3476,9): message : the missing variadic argument 1 is required by format string '%s'
+  wolfssl.lib(memory.obj) : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
+LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_get_peer_chain
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_get_chain_count
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_get_chain_X509
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_get_chain_cert_pem
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_EnableCRL
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_LoadCRL
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_SetCRL_Cb
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_CTX_EnableOCSP
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_CTX_SetOCSP_OverrideURL
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_CTX_EnableOCSPStapling
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_CTX_EnableOCSPMustStaple
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_UseOCSPStapling
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_UseOCSPStaplingV2
+client.obj : error LNK2001: unresolved external symbol _wolfSSL_get_ocsp_producedDate
+D:\2205\2205_crypto_wolfssl\wolfssl\Debug\client.exe : fatal error LNK1120: 14 unresolved externals
