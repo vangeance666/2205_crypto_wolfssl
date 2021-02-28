@@ -238,7 +238,7 @@ static void print_help() {
 		"-C <path> 	CA cert file <path> to verify intermediate cert.\n"
 		"-V <path>	Intermediate cert file <path> to be verified by CA cert specified.\n"
 		"-s <path>	File path of where server's response using GET/POST will be saved into.\n"
-		"-a <request header> Extra request header, delimit using ';' E.g. \"Connection: close;Content-Length: 0\"\n"
+		"-a <request header> Extra request header, delimit using '&' E.g. \"Connection: close;Content-Length: 0\"\n"
 	);
 }
 
@@ -667,7 +667,7 @@ cutSz = sizeof(X) - 1; \
 			int beforeIndex = 0, curIndex = 0;
 			// Self parse, strcat buggy cant seem to work
 			for (p = extraHeader; *p; ++p) {
-				if (*p == ';') {
+				if (*p == '&') {
 					for (i = beforeIndex; i < (p - extraHeader); )
 						buf1[curIndex++] = extraHeader[i++];
 						buf1[curIndex++] = '\n';
@@ -678,7 +678,7 @@ cutSz = sizeof(X) - 1; \
 
 		// Start forming the request
 		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
-		_J(HDR_HOST" ")if (str_index("www.", host, 1) == -1) { _J("www."); }_J(host)_J("\n")_J(buf1)_J("\n")_J(FLD_ENDLN)
+		_J(HDR_HOST" ")if (str_index("", host, 1) == -1) { _J("www."); }_J(host)_J("\n")_J(buf1)_J("\n")_J(FLD_ENDLN)
 		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
