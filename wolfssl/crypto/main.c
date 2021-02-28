@@ -100,7 +100,7 @@ enum {
 static char request[] = "";
 char *createReq(char type[], char url[], char para[]);
 static int cert_show_details(const char *certPath);
-static int build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer);
+static int build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer,const char *header);
 
 static int printPeerCert = 0;
 static void print_help();
@@ -119,6 +119,8 @@ int main(int argc, char **argv)
 	char	vrfCert[MAX_PATH];
 	char	request[BUFFER_SIZE];
 	char	saveRequestPath[MAX_PATH] = RESPONSE_FILE;
+
+	char *header;
 	
 
 	//build_msg_header("POST", "youtube.com/results", "search_query=ihate+school&test1=gogo&test2=fa", request); fprintf(stdout, "%s", request); // Works
@@ -128,9 +130,12 @@ int main(int argc, char **argv)
 	int opt, mode;
  //
 
-	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s;")) != -1) {
+	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s:a;")) != -1) {
 		switch (opt)
 		{
+			case 'a':
+				header = myoptarg;
+				break;
 			case 'v': // If verify cert manual mode, make sure that '1' and '2' is provided
 				fprintf(stdout, "MODE_VERIFY_MANUAL\n");
 				mode = MODE_VERIFY_MANUAL;
@@ -199,12 +204,12 @@ int main(int argc, char **argv)
 			printf("saveRequestPath: %s\n", saveRequestPath);
 			if (msgType == MSG_POST) {
 				memset(request, 0, sizeof(request));
-				if (!build_msg_header("POST", host, msgParams, request)) {
+				if (!build_msg_header("POST", host, msgParams, request,header)) {
 					eprintf("Failed to build message for sending host.", finish);
 				} fprintf(stdout, "%s\n", request); 
 			} else if (msgType == MSG_GET) {
 				memset(request, 0, sizeof(request));
-				if (!build_msg_header("GET", host, msgParams, request)) {
+				if (!build_msg_header("GET", host, msgParams, request,header)) {
 					eprintf("Failed to build message for sending host.", finish);
 				} fprintf(stdout, "%s\n", request);
 			} else {
@@ -233,6 +238,7 @@ static void print_help() {
 		"-C <path> 	CA cert file <path> to verify intermediate cert.\n"
 		"-V <path>	Intermediate cert file <path> to be verified by CA cert specified.\n"
 		"-s <path>	File path of where server's response using GET/POST will be saved into.\n"
+		"-a <request header> Extra request header, delimit using ';' E.g. \"Connection: close;Content-Length: 0\"\n"
 	);
 }
 
@@ -590,7 +596,7 @@ if (A == -1) { \
  * @return           If sucesssful will return 1, else 0
  */
 static int build_msg_header(const char *iType, const char *iUrl, 
-	const char *args, char *outBuffer) {
+	const char *args, char *outBuffer,const char *header) {
 #define SET_FIRST_CUT(X) \
 if (offset == -1) { \
 offset = str_index(X, iUrl, 1); \
@@ -605,8 +611,11 @@ cutSz = sizeof(X) - 1; \
 	}
 
 	size_t i; 
-	const char *sz, *cut, *host, *path, *p;
+	const char *sz, *cut, *host, *path, *p, *extraHeader;
+	extraHeader = header;
+
 	char buf[BUFFER_SIZE] = "";
+	char buf1[BUFFER_SIZE] = "";
 	/* Start of extracting host and path */
 	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret = 0;	
 	
@@ -648,21 +657,34 @@ cutSz = sizeof(X) - 1; \
 				if (*p == '&') {
 					for (i = beforeIndex; i < (p - args); )
 						buf[curIndex++] = args[i++];
-					buf[curIndex++] = '\r';
-					buf[curIndex++] = '\n';
-					beforeIndex = (p - args) + 1;
+						buf[curIndex++] = '&';
+						beforeIndex = (p - args) + 1;
 				}
 			} for (i = beforeIndex; i < (p - args); buf[curIndex++] = args[i++]);				
 		}
+
+		if (extraHeader && extraHeader != "") {
+			int beforeIndex = 0, curIndex = 0;
+			// Self parse, strcat buggy cant seem to work
+			for (p = extraHeader; *p; ++p) {
+				if (*p == ';') {
+					for (i = beforeIndex; i < (p - extraHeader); )
+						buf1[curIndex++] = extraHeader[i++];
+						buf1[curIndex++] = '\n';
+						beforeIndex = (p - extraHeader) + 1;
+				}
+			} for (i = beforeIndex; i < (p - extraHeader); buf1[curIndex++] = extraHeader[i++]);
+		}
+
 		// Start forming the request
 		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
-		_J(HDR_HOST" www.")if (str_index("www.", host, 1) == -1) { _J("www."); }_J(host)_J(FLD_ENDLN)
+		_J(HDR_HOST" ")if (str_index("www.", host, 1) == -1) { _J("www."); }_J(host)_J("\n")_J(buf1)_J("\n")_J(FLD_ENDLN)
 		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
 	} else if (str_eq("GET", iType, 1)) {
 		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_ENDLN)
-			_J(HDR_HOST" ")if (str_index("www.", host, 1) == -1) { _J("www."); } _J(host)_J(FLD_FINISH)
+			_J(HDR_HOST" ")if (str_index("www.", host, 1) == -1) { _J("www."); } _J(host)_J("\n")_J(buf1)_J(FLD_FINISH)
 		ret = 1;
 	}
 	else {
