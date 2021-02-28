@@ -172,7 +172,6 @@ static char *str_slice_copy(const char *s, int start, int end) {
 	}
 	return 0;
 }
-
 #endif
 
 

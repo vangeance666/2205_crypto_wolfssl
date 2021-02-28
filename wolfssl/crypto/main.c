@@ -22,6 +22,7 @@
 // Need these 3 to enable OCSP for cert manager
 #include <wolfssl/openssl/rsa.h>
 #include <wolfssl/openssl/x509v3.h>
+#include <wolfssl/internal.h>
 
 // Our functions and declarations (Sequence matters)
 #include "globals.h"
@@ -280,7 +281,10 @@ static int cert_show_details(const char *certPath) {
 	if ((cert = wolfSSL_X509_load_certificate_file(certPath, SSL_FILETYPE_PEM)) == NULL)
 		eprintf("Unable to load cert file to memory.\n", cleanup);
 	
-	suc = print_cert_details(cert);	
+	show_x509_pub_key_info(cert);
+
+
+	//suc = print_cert_details(cert);	
 
 cleanup:	
 	XFREE(cert, 0, DYNAMIC_TYPE_X509);

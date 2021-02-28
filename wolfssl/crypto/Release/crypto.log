@@ -1,51 +1,41 @@
 ﻿  main.c
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(86): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(79): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238): note: see declaration of 'gethostbyname'
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(80): warning C4474: 'fprintf' : too many arguments passed for format string
   c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(80): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(86): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1868): note: see declaration of 'inet_ntoa'
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(71): warning C4101: 'wsaData': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(101): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(111): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(453): note: see declaration of 'strtok'
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(97): warning C4101: 'i': unreferenced local variable
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\common.h(156): warning C4101: 'i': unreferenced local variable
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(7): warning C4013: 'print_cert_details' undefined; assuming extern returning int
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(21): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(49): warning C4101: 'i': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(49): warning C4101: 'suc': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(49): warning C4101: 'sigType': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(49): warning C4101: 'ret': unreferenced local variable
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(78): warning C4102: 'clean_all': unreferenced label
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(20): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(156): warning C4101: 'i': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(156): warning C4101: 'suc': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(156): warning C4101: 'sigType': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(156): warning C4101: 'ret': unreferenced local variable
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(185): warning C4102: 'clean_all': unreferenced label
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\requests.h(22): warning C4101: 'buffer': unreferenced local variable
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\verify.h(33): warning C4102: 'finish': unreferenced label
-main.c(221): warning C4013: 'start_session' undefined; assuming extern returning int
-main.c(290): warning C4102: 'finish': unreferenced label
-main.c(315): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-main.c(328): warning C4090: 'function': different 'const' qualifiers
-main.c(312): warning C4101: 'lookupName': unreferenced local variable
-main.c(449): warning C4020: 'client_write': too many actual parameters
-main.c(464): warning C4102: 'finish': unreferenced label
-main.c(406): warning C4101: 'i': unreferenced local variable
-main.c(510): warning C4013: 'get_hostname_from_url' undefined; assuming extern returning int
-main.c(541): warning C4102: 'finish': unreferenced label
-main.c(559): warning C4101: 'sz': unreferenced local variable
-main.c(559): warning C4101: 'h': unreferenced local variable
-main.c(559): warning C4101: 'stop': unreferenced local variable
-main.c(642): warning C4018: '<': signed/unsigned mismatch
-main.c(648): warning C4018: '<': signed/unsigned mismatch
-main.c(668): warning C4090: 'function': different 'const' qualifiers
+main.c(220): warning C4013: 'start_session' undefined; assuming extern returning int
+main.c(291): warning C4102: 'finish': unreferenced label
+main.c(316): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+main.c(329): warning C4090: 'function': different 'const' qualifiers
+main.c(313): warning C4101: 'lookupName': unreferenced local variable
+main.c(450): warning C4020: 'client_write': too many actual parameters
+main.c(465): warning C4102: 'finish': unreferenced label
+main.c(407): warning C4101: 'i': unreferenced local variable
+main.c(511): warning C4013: 'get_hostname_from_url' undefined; assuming extern returning int
+main.c(542): warning C4102: 'finish': unreferenced label
+main.c(560): warning C4101: 'sz': unreferenced local variable
+main.c(560): warning C4101: 'h': unreferenced local variable
+main.c(560): warning C4101: 'stop': unreferenced local variable
+main.c(643): warning C4018: '<': signed/unsigned mismatch
+main.c(649): warning C4018: '<': signed/unsigned mismatch
 main.c(669): warning C4090: 'function': different 'const' qualifiers
 main.c(670): warning C4090: 'function': different 'const' qualifiers
-main.c(672): warning C4047: 'return': 'char *' differs in levels of indirection from 'int'
+main.c(671): warning C4090: 'function': different 'const' qualifiers
+main.c(673): warning C4047: 'return': 'char *' differs in levels of indirection from 'int'
   Generating code
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(230): warning C4700: uninitialized local variable 'ret' used
-  1 of 1088 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  1 of 1012 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.exe
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.pdb (Full PDB)

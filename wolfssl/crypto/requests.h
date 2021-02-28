@@ -1,7 +1,7 @@
 #ifndef requests_h
 #define requests_h
 
-#include <wolfssl\internal.h>
+
 
 typedef enum {
 	WRITE_OK,
