@@ -23,6 +23,9 @@ static int client_read(WOLFSSL *ssl, char *reply,
 
 	time_t start, end; time(&start);
 
+	int foundIndex = -1;
+
+	int count = 0;
 	do {
 		err = 0; /* reset error */
 		ret = wolfSSL_read(ssl, reply, replyLen);
@@ -30,14 +33,12 @@ static int client_read(WOLFSSL *ssl, char *reply,
 
 		if (ret <= 0) {				
 			if (err != WOLFSSL_ERROR_WANT_READ) {
-				*setFinish = 1;
-				break;
-				//printf("SSL_read reply error %d, %s\n", err,
-				//	wolfSSL_ERR_error_string(err, buffer));
-				//if (!exitWithRet) // exitWith Ret is to indicate that once error just ret from function. 
-				//	fprintf(stderr, "SSL_read failed");
-				//else
-				//	break;
+				printf("SSL_read reply error %d, %s\n", err,
+					wolfSSL_ERR_error_string(err, buffer));
+				if (!exitWithRet) // exitWith Ret is to indicate that once error just ret from function. 
+					fprintf(stderr, "SSL_read failed");
+				else
+					break;
 			}
 		}
 		if (err == WOLFSSL_ERROR_WANT_READ) {
@@ -50,7 +51,7 @@ static int client_read(WOLFSSL *ssl, char *reply,
 		}
 		
 	} while ((err == WOLFSSL_ERROR_WANT_READ));
-	//*checkFinish = ret;
+
 
 	if (ret > 0) 
 		reply[ret] = 0; /* null terminate */
@@ -63,18 +64,31 @@ static int client_read(WOLFSSL *ssl, char *reply,
 			fprintf(fPtr, "%s", reply);
 		}
 	}
-	//*checkFinish = 1;
+
+	foundIndex = str_index("\r\n\r\n", reply, 1);
+	if (foundIndex != -1) {
+		*setFinish = (reply[foundIndex -1] == '0'); // So outside will stop
+	}
+		/*printf("Found slash %d times, R N: %s\n", count, reply);
+		printf("Found at %d of:%s\n", findEnd, reply);
+		printf("Before that is:%c\n", reply[findEnd - 1]);*/
+	
+	
+
+	/*foundIndex = str_index("\r\n\r\n", reply, 1);
+	if (foundIndex != -1) {
+		count++;
+		printf("Found slash %d times, R N: %s\n", count,  reply);
+		printf("Found at %d of:%s\n", foundIndex, reply);
+		printf("Before that is:%c\n", reply[foundIndex - 1]);
+	}*/
+
 	// For identify by html. If no html tag die.
-	if ((strstr(reply, "</html>") != NULL)) {
+	/*if ((strstr(reply, "</html>") != NULL)) {
 		printf("found end html tag\n");
 		*setFinish = 1;
-	}
-	//printf("ssl->buffers.clearOutputBuffer.length: %d\n", (int)ssl->buffers.clearOutputBuffer.length);
-	//printf("ssl->buffers.outputBuffer.length: %d\n", (int)ssl->buffers.outputBuffer.length);
-	//printf("ssl->buffers.inputBuffer.length: %d\n", (int)ssl->buffers.inputBuffer.length);
+	}*/
 
-	//printf("\n\n---Ret: %d-----wolfssl_peek(ssl): %d---------\n", ret, wolfSSL_peek(ssl, reply, replyLen));
-		
 	return err;
 }
 
@@ -82,7 +96,6 @@ static int client_read(WOLFSSL *ssl, char *reply,
 /** Helper function to write Message with GET/POST into SSL object */
 static int client_write(WOLFSSL *ssl, const char *msg, int msgSz, const char *str)
 {
-	printf("Inside ClientWrite\n");
 
 	int ret, err;
 	char buffer[WOLFSSL_MAX_ERROR_SZ];

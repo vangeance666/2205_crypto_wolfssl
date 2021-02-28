@@ -165,7 +165,7 @@ static int show_x509_pub_key_info(WOLFSSL_X509 *x509) {
 			wc_FreeRsaKey(&rsa);
 
 			break;
-		default:
+		
 			
 			
 	}

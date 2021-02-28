@@ -31,7 +31,6 @@
 #include "callbacks.h"
 #include "requests.h"
 #include "verify.h"
-#include "junkstobedeleted.h" //Delete once everything sui
 #include "argparse.h"
 
 #define BUFFER_SIZE 2048
@@ -101,7 +100,7 @@ enum {
 static char request[] = "";
 char *createReq(char type[], char url[], char para[]);
 static int cert_show_details(const char *certPath);
-static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer);
+static int build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer);
 
 static int printPeerCert = 0;
 static void print_help();
@@ -200,19 +199,14 @@ int main(int argc, char **argv)
 			printf("saveRequestPath: %s\n", saveRequestPath);
 			if (msgType == MSG_POST) {
 				memset(request, 0, sizeof(request));
-				build_msg_header("POST",
-					host, 
-					msgParams,
-					request);
-
-				fprintf(stdout, "%s\n", request); 
+				if (!build_msg_header("POST", host, msgParams, request)) {
+					eprintf("Failed to build message for sending host.", finish);
+				} fprintf(stdout, "%s\n", request); 
 			} else if (msgType == MSG_GET) {
 				memset(request, 0, sizeof(request));
-				build_msg_header("GET",
-					host,
-					msgParams,
-					request);
-				fprintf(stdout, "%s\n", request);
+				if (!build_msg_header("GET", host, msgParams, request)) {
+					eprintf("Failed to build message for sending host.", finish);
+				} fprintf(stdout, "%s\n", request);
 			} else {
 				goto finish;
 			}
@@ -505,16 +499,14 @@ static int start_session(const char *zmsg, const char *url, word16 port, const c
 	/* End of init Session*/
 	
 	// Set to always verify peer, will goto callback no matter what. (Uncomment once needed)
-	//wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, printPeerCert ? myVerify : 0);
+	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, printPeerCert ? myVerify : 0);
 
-	printf("savepath:%s\n", savePath);
+
 	if (!get_hostname_from_url(url, hostName)) {
 		retCode = SES_EXTRACT_HOSTNAME_FAIL;
 		eprintf("Unable to get hostname from full url path", ctx_cleanup);
 	}
 	
-
-
 	if (savePath) {
 		saveResponseFile = fopen(savePath, "w");
 		if (saveResponseFile) {
@@ -543,6 +535,16 @@ finish:
 	return retCode;
 }
 
+
+/**
+ * Helper function use within building of 
+ * socket details as hostname lookup cant have
+ * https://www. infront. 
+
+ * @param  url     Full url of host
+ * @param  outHost Buffer to store results
+ * @return         If successful 1, else 0
+ */
 static int get_hostname_from_url(const char *url, char *outHost) {
 #define GET_FIRST_INDEX(A, B, C, X) \
 if (A == -1) { \
@@ -553,22 +555,15 @@ if (A == -1) { \
 	if (!url || !outHost)
 		return 0;
 
-	printf("url %s\n", url);
-	//printf("hostname %s\n", hostname);
-
 	int length = 0, found = -1, firstIndex = 0, i = -1;
 	const char *sz, *p = url, *h, *stop;
-	//get_hostname_from_url("https://www.youtube.com/results/yolo", testOut);
 
 	GET_FIRST_INDEX(found, firstIndex, url, "https://www.")
 	GET_FIRST_INDEX(found, firstIndex, url, "http://www.");
 	GET_FIRST_INDEX(found, firstIndex, url, "www.");
 
-	printf("firstoffset:%d\n", found);
 	if (found == 0)
 		p += firstIndex;
-
-	printf("first p:%c\n", *p);
 
 	for (; *p; ++p) {
 		if (*p == '/' || *p == '\\') {
@@ -579,12 +574,23 @@ if (A == -1) { \
 		}
 	} *outHost = 0;
 
-#undef SET_FIRST_OFFSET
-
+#undef GET_FIRST_INDEX
 	return 1;
 }
 
-static char *build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer) {
+
+/**
+ * Self crafted GET and POST message builder.
+ * 
+ * @param  iType     String containing POST or GET
+ * @param  iUrl      URL, For e.g. youtube.com or youtube.com/results
+ *                   Slicing https and http will be done.
+ * @param  args      GET or POST fields
+ * @param  outBuffer Buffer to store results
+ * @return           If sucesssful will return 1, else 0
+ */
+static int build_msg_header(const char *iType, const char *iUrl, 
+	const char *args, char *outBuffer) {
 #define SET_FIRST_CUT(X) \
 if (offset == -1) { \
 offset = str_index(X, iUrl, 1); \
@@ -602,7 +608,7 @@ cutSz = sizeof(X) - 1; \
 	const char *sz, *cut, *host, *path, *p;
 	char buf[BUFFER_SIZE] = "";
 	/* Start of extracting host and path */
-	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret;	
+	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret = 0;	
 	
 	SET_FIRST_CUT("https://www.");
 	SET_FIRST_CUT("http://www.");
@@ -650,14 +656,17 @@ cutSz = sizeof(X) - 1; \
 		}
 		// Start forming the request
 		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
-		_J(HDR_HOST" www.")_J(host)_J(FLD_ENDLN)
+		_J(HDR_HOST" www.")if (str_index("www.", host, 1) == -1) { _J("www."); }_J(host)_J(FLD_ENDLN)
 		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
 	} else if (str_eq("GET", iType, 1)) {
 		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_ENDLN)
-		_J(HDR_HOST" www.")_J(host)_J(FLD_FINISH) 
+			_J(HDR_HOST" ")if (str_index("www.", host, 1) == -1) { _J("www."); } _J(host)_J(FLD_FINISH)
 		ret = 1;
+	}
+	else {
+		ret = 0;
 	}
 	
 cleanup:
@@ -669,7 +678,6 @@ cleanup:
 if (host) free(host);
 if (path) free(path);
 if (cut) free(cut);
-
 	return ret;
 }
 

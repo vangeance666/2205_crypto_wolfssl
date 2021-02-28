@@ -24,7 +24,6 @@ static int str_eq(const char *a, const char *b, int ignore_case) {
 	return 0;
 }
 
-
 /**
 * Returns the index of the needle in the haystack.
 * @param  needle      The needle string.

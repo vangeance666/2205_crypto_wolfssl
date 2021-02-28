@@ -136,7 +136,6 @@
     <ClInclude Include="certfields.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="globals.h" />
-    <ClInclude Include="junkstobedeleted.h" />
     <ClInclude Include="requests.h" />
     <ClInclude Include="verify.h" />
   </ItemGroup>
