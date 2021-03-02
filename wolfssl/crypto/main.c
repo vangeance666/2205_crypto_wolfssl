@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 	char	request[BUFFER_SIZE];
 	char	saveRequestPath[MAX_PATH] = RESPONSE_FILE;
 
-	char *header;
+	char *header = "";
 	
 
 	//build_msg_header("POST", "youtube.com/results", "search_query=ihate+school&test1=gogo&test2=fa", request); fprintf(stdout, "%s", request); // Works
@@ -678,7 +678,7 @@ cutSz = sizeof(X) - 1; \
 
 		// Start forming the request
 		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
-		_J(HDR_HOST" ")if (str_index("", host, 1) == -1) { _J("www."); }_J(host)_J("\n")_J(buf1)_J("\n")_J(FLD_ENDLN)
+			_J(HDR_HOST" ")if (str_index("", host, 1) == -1) { _J("www."); }_J(host)if (extraHeader && extraHeader != "") { _J("\n")_J(buf1)}_J("\n")_J(FLD_ENDLN)
 		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
