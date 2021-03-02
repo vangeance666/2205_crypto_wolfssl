@@ -16,7 +16,7 @@ typedef enum {
 
 /** WolfSSL's helper function to read server response */
 static int client_read(WOLFSSL *ssl, char *reply, 
-	int replyLen, int exitWithRet, int *setFinish, FILE *fPtr) {
+	int replyLen, int exitWithRet, int *setFinish, int *endBlock, FILE *fPtr) {
 
 	int ret, err;
 	char buffer[WOLFSSL_MAX_ERROR_SZ];
@@ -52,7 +52,6 @@ static int client_read(WOLFSSL *ssl, char *reply,
 		
 	} while ((err == WOLFSSL_ERROR_WANT_READ));
 
-
 	if (ret > 0) 
 		reply[ret] = 0; /* null terminate */
 	
@@ -67,7 +66,10 @@ static int client_read(WOLFSSL *ssl, char *reply,
 
 	foundIndex = str_index("\r\n\r\n", reply, 1);
 	if (foundIndex != -1) {
+		*endBlock = 1;
 		*setFinish = (reply[foundIndex -1] == '0'); // So outside will stop
+		/*printf("setFinish: %d\n", (reply[foundIndex - 1] == '0'));*/
+
 	}
 		/*printf("Found slash %d times, R N: %s\n", count, reply);
 		printf("Found at %d of:%s\n", findEnd, reply);
