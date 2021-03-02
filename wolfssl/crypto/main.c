@@ -224,6 +224,7 @@ int main(int argc, char **argv)
 				goto finish;
 			}
 			
+			printf("ajsndkasndk _____> %s",request);
 			start_session(request,
 				host,
 				HTTPS_PORT,
@@ -246,7 +247,7 @@ static void print_help() {
 		"-C <path> 	CA cert file <path> to verify intermediate cert.\n"
 		"-V <path>	Intermediate cert file <path> to be verified by CA cert specified.\n"
 		"-s <path>	File path of where server's response using GET/POST will be saved into.\n"
-		"-a <request header> Extra request header, delimit using '&' E.g. \"Connection: close;Content-Length: 0\"\n"
+		"-a <request header> Additional request header, delimit using '&' E.g. \"Connection: close&Content - Length : 0\"\n"
 	);
 }
 

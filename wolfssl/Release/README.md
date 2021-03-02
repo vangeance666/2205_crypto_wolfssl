@@ -30,6 +30,7 @@ Files within in *crypto* project.
 -C [path]       CA cert file [path] to verify intermediate cert.
 -V [path]       Intermediate cert file [path] to be verified by CA cert specified.
 -s [path]       File path of where server's response using GET/POST will be saved into.
+-a <request header> Additional request header, delimit using '&' E.g. "Connection: close&Content-Length: 0"
 </pre>
 
 
@@ -48,5 +49,5 @@ Files within in *crypto* project.
 ### Parameters usage
 `➜ crypto.exe -h youtube.com/results -G search_query=ihate+school`
 
-### Sending POST message via SLL
-Try get some examples up @hongyi thx bos
+### Sending POST message via SSL
+`➜ crypto.exe -h "www.allforyou.sg/login" -P "Email=test@test.com&Password=pass" -a "content-length: 0"
