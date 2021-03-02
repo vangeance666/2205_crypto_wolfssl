@@ -38,7 +38,7 @@
 #define HEADER_SIZE 8192
 
 #define CLI_MSG_SZ      32
-#define CLI_REPLY_SZ    256
+#define CLI_REPLY_SZ    128
 #define URL_LEN 2048
 
 #define crlPemDir "../../certs/crl"
@@ -94,8 +94,16 @@ enum {
 	MODE_SEND_MSG,
 	
 	MSG_POST,
-	MSG_GET
+	MSG_GET,
+
+
+	HTTP_DEFAULT,
+	HTTP_OK = 200,
+	HTTP_MOVED_PERM = 301,
+	HTTP_MOVED_TEMP
 };
+
+
 
 static char request[] = "";
 char *createReq(char type[], char url[], char para[]);
@@ -449,13 +457,41 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 	
 	(void)client_write(ssl, zmsg, strlen(zmsg), "", 1);
 
-	int isFinished = 0;
-	do {
-		if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &isFinished, saveFilePtr)) != 0) {
-			retCode = SES_READ_RESP_FAIL;
-			eprintf("Encoutnered error when conducting wolfSSL_read()", socket_cleanup);
-		}
-	} while (!isFinished);
+	int isFinished = 0, endBlock = 0, httpStatus = HTTP_DEFAULT;
+
+#define DO_READ() \
+if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &isFinished, &endBlock, saveFilePtr)) != 0) { \
+	retCode = SES_READ_RESP_FAIL; \
+	eprintf("Encoutnered error when conducting wolfSSL_read()", socket_cleanup); \
+}
+
+	// Read once get HTTP Status then react accordingly.
+
+	
+	
+	DO_READ(); 
+	if (str_index("200 OK\r\n", outMsg, 1) != -1) {
+		printf("--------------Found OK 200 response----------------\n");
+	}
+	
+	httpStatus = (str_index("200 OK\r\n", outMsg, 1) != -1) ? HTTP_OK : HTTP_DEFAULT;
+
+	//printf("Httpstats: %d\n", httpStatus);
+	//printf("endBlock: %d\n", endBlock);
+	//printf("isFinished: %d\n", isFinished);
+
+	switch (httpStatus) {
+	case HTTP_OK:
+		while (!isFinished) { DO_READ(); } 
+		break;
+	case HTTP_DEFAULT:
+		while (!endBlock) { DO_READ(); }
+		break;
+	default:
+		eprintf("Invalid http response. Wont come here one.", socket_cleanup);
+	}
+	
+#undef READ_BLOCK
 
 socket_cleanup:
 	CloseSocket(sockfd);

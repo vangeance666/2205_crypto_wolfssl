@@ -1,6 +1,19 @@
 #ifndef _WIN_USER_SETTINGS_H_
 #define _WIN_USER_SETTINGS_H_
 
+
+
+//#define NO_DH
+//
+//#define WOLFSSL_TLS13
+//#define WC_RSA_PSS
+//#define HAVE_HKDF
+//#define HAVE_FFDHE_2048
+//#define HAVE_FFDHE_3072
+//#define HAVE_FFDHE_4096
+//#define HAVE_FFDHE_6144
+//#define HAVE_FFDHE_8192
+
 #define WOLFSSL_ALWAYS_VERIFY_CB
 #define WOLFSSL_VERIFY_CB_ALL_CERTS
 #define SESSION_CERTS

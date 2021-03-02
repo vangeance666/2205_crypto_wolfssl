@@ -1,6 +1,8 @@
 ﻿  echoclient.c
   Generating code
-  All 987 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  354 of 987 functions (35.9%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    82 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   echoclient.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\echoclient.exe
   echoclient.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\echoclient.pdb (Full PDB)
