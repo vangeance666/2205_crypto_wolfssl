@@ -45,8 +45,8 @@
 
 #define MOZILLA_ROOT "./certs/mozilla-roots-cas.pem"
 
-#define FLD_ENDLN "\r\n"
-#define FLD_FINISH FLD_ENDLN FLD_ENDLN
+#define FLD_END_HEADER "\r\n"
+#define FLD_FINISH FLD_END_HEADER FLD_END_HEADER
 #define HDR_HTTP "HTTP/1.1"
 #define HDR_HOST "Host:"
 #define HDR_POST "POST"
@@ -95,23 +95,32 @@ enum {
 	
 	MSG_POST,
 	MSG_GET,
-
-
-	HTTP_DEFAULT,
-	HTTP_OK = 200,
-	HTTP_MOVED_PERM = 301,
-	HTTP_MOVED_TEMP
 };
 
+typedef enum {
+	HTTP_DEFAULT,
+	HTTP_OK = 200,
+	HTTP_MULTIPLE_CHOICE = 300,
+	HTTP_MOVED_PERM,
+	HTTP_MOVED_FOUND,
+	HTTP_MOVED_SEE_OTHER,
+	HTTP_MOVE_NOT_MODIFIED,
+	HTTP_MOVE_USE_PROXY = 305,
+	HTTP_MOVE_SWITCH_PROXY,
+	HTTP_TEMP_REDIRECT,
+	HTTP_PERM_REDIRECT,
+	HTTP_UNASSIGNED
+} http_res_t;
 
 
 static char request[] = "";
-char *createReq(char type[], char url[], char para[]);
 static int cert_show_details(const char *certPath);
 static int build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer,const char *header);
 
 static int printPeerCert = 0;
+static int followRedirect = 1;
 static void print_help();
+static char *craft_redirect_msg(const char *locationUrl);
 
 int main(int argc, char **argv)
 {
@@ -130,7 +139,12 @@ int main(int argc, char **argv)
 
 	char *header;
 	
+	/*char *test;
 
+	test = craft_redirect_msg("https://www.youtube.com/youtubei/v1/guide?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8");
+
+	printf("test:%s\n", test);
+	return 0;*/
 	//build_msg_header("POST", "youtube.com/results", "search_query=ihate+school&test1=gogo&test2=fa", request); fprintf(stdout, "%s", request); // Works
 
 	//build_msg_header("GET", "reddit.com", 0, request); fprintf(stdout, "%s\n", request); // Works
@@ -138,7 +152,7 @@ int main(int argc, char **argv)
 	int opt, mode;
  //
 
-	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s:a;")) != -1) {
+	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s:a;L")) != -1) {
 		switch (opt)
 		{
 			case 'a':
@@ -178,6 +192,9 @@ int main(int argc, char **argv)
 				break;
 			case '?':
 				print_help();
+				break;
+			case 'L':
+				followRedirect = 1;
 				break;
 			default:
 				print_help();
@@ -248,6 +265,7 @@ static void print_help() {
 		"-V <path>	Intermediate cert file <path> to be verified by CA cert specified.\n"
 		"-s <path>	File path of where server's response using GET/POST will be saved into.\n"
 		"-a <request header> Additional request header, delimit using '&' E.g. \"Connection: close&Content - Length : 0\"\n"
+		"-L			Follows redirect until receive HTTP 200 response.\n"
 	);
 }
 
@@ -305,7 +323,7 @@ finish:
 
 /**
  * Helper function for setting up socket.
- * 
+ *
  * @param  addr SOCKADDR_IN_T object
  * @param  peer IP Address/Hostname of server
  * @param  port Port number to connect using
@@ -313,32 +331,33 @@ finish:
  */
 static int build_addr(SOCKADDR_IN_T *addr, const char *peer, word16 port) {
 
-	if (addr == NULL) 
-		return ADDR_INVALID_ADDR_PTR;	
+	if (addr == NULL)
+		return ADDR_INVALID_ADDR_PTR;
 
-	int res;	
+	int res;
 	WSADATA wsaData;
 	struct hostent *entry;
 	char *lookupName;
 
 	//For windows this one is required for gethostbyname to work
-	if ((res = WSAStartup(MAKEWORD(2, 2), &wsaData)) != NULL) 
+	if ((res = WSAStartup(MAKEWORD(2, 2), &wsaData)) != NULL)
 		return ADDR_WSA_FAIL;
 
 	// Make it all null first
 	XMEMSET(addr, 0, sizeof(SOCKADDR_IN_T));
 
-	
+
 	entry = gethostbyname(peer);
 	//Set IP address to first IP using lookup
 	if (entry) {
 		XMEMCPY(&addr->sin_addr.s_addr, entry->h_addr_list[0],
 			entry->h_length);
-	} else {		
+	}
+	else {
 		if (is_valid_ip(peer))
 			addr->sin_addr.s_addr = inet_addr(peer);
-		else 
-			return ADDR_INVALID_PEER_IP;		
+		else
+			return ADDR_INVALID_PEER_IP;
 	}
 
 	addr->sin_family = AF_INET;
@@ -347,11 +366,9 @@ static int build_addr(SOCKADDR_IN_T *addr, const char *peer, word16 port) {
 	return ADDR_SUCESS;
 }
 
-
-
 /**
  * Helper function to establish socket connect
- * to server. 
+ * to server.
  * @param  sockfd Socket Object
  * @param  ip     Server's IP Address/Hostname in string
  * @param  port   Server's Port Number to connect
@@ -364,7 +381,7 @@ static int tcp_connect(SOCKET_T *sockfd, const char *ip, word16 port, WOLFSSL *s
 	if (!build_addr(&addr, ip, port))
 		return TCP_ADDR_FAIL;
 
-	*sockfd = socket(AF_INET, SOCK_STREAM, 0);	
+	*sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (connect(*sockfd, (struct sockaddr*) &addr, sizeof(addr)) != 0)
 		return TCP_CONNECT_FAIL;//eprintf("Failed to connect to socket\n", socket_cleanup)
@@ -373,10 +390,10 @@ static int tcp_connect(SOCKET_T *sockfd, const char *ip, word16 port, WOLFSSL *s
 
 
 /**
- * Helper function to conduct ssl handshake 
+ * Helper function to conduct ssl handshake
  * within session.
 
- * @param  ssl WOLFSSL Object Ptr 
+ * @param  ssl WOLFSSL Object Ptr
  * @return     If success 1, else 0
  */
 static int connect_handshake(WOLFSSL *ssl) {
@@ -395,6 +412,25 @@ static int connect_handshake(WOLFSSL *ssl) {
 }
 
 
+/* Parses first read response from server reply and determine
+which http response code was received */
+static http_res_t http_status_from_buffer(const char *buf) {
+	char tmp[128]; memset(tmp, 0, sizeof(tmp));
+	int i, statusPos = -1, firstEnd = str_index("\r\n", buf,1);
+
+	
+	for (i = HTTP_OK; i < HTTP_UNASSIGNED; ++i) {
+		sprintf(tmp, "%d", i);
+
+		statusPos = str_index(tmp, buf, 1);
+		// if the index of found code is before the first \r\n, treat it as found
+		if (statusPos != -1 && (statusPos < firstEnd)) {
+			return i;
+		}
+	}	
+	return HTTP_DEFAULT;
+}
+
 /**
  * Single round of establish sesesion. Can be called
  * multiple rounds to simulate browser?
@@ -410,7 +446,7 @@ static int connect_handshake(WOLFSSL *ssl) {
  */
 static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg, 
 	const char *hostname, word16 port,
-	char *outMsg, int outMsgSz, FILE *saveFilePtr) {
+	char *outMsg, int outMsgSz, FILE *saveFilePtr, http_res_t *responseCode, char *redirectUrl) {
 
 	WOLFSSL *ssl;
 	size_t	i; int err;
@@ -439,7 +475,7 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 		eprintf("Failed to start new session", ssl_cleanup);
 	}		
 
-	//Attach the socket to ssl session
+	// Attach the socket to ssl session
 	if (wolfSSL_set_fd(ssl, sockfd) != WOLFSSL_SUCCESS) {
 		retCode = SES_FD_FAIL;
 		eprintf("Failed to attach socket to session", socket_cleanup);		
@@ -458,39 +494,71 @@ static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg,
 	
 	(void)client_write(ssl, zmsg, strlen(zmsg), "", 1);
 
-	int isFinished = 0, endBlock = 0, httpStatus = HTTP_DEFAULT;
+	int htmlFinish = 0, endBlock = 0, httpStatus = HTTP_DEFAULT;
 
 #define DO_READ() \
-if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &isFinished, &endBlock, saveFilePtr)) != 0) { \
+if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &htmlFinish, &endBlock, saveFilePtr)) != 0) { \
 	retCode = SES_READ_RESP_FAIL; \
 	eprintf("Encoutnered error when conducting wolfSSL_read()", socket_cleanup); \
 }
-
-	// Read once get HTTP Status then react accordingly.
-
 	
-	
+	/*
+		Always read once to get response code first then
+		depending on situation/code	then continue reading 
+	*/
 	DO_READ(); 
-	if (str_index("200 OK\r\n", outMsg, 1) != -1) {
-		printf("--------------Found OK 200 response----------------\n");
-	}
-	
-	httpStatus = (str_index("200 OK\r\n", outMsg, 1) != -1) ? HTTP_OK : HTTP_DEFAULT;
+	printf("%s\n", outMsg);
 
-	//printf("Httpstats: %d\n", httpStatus);
-	//printf("endBlock: %d\n", endBlock);
-	//printf("isFinished: %d\n", isFinished);
+	httpStatus = http_status_from_buffer(outMsg); *responseCode = httpStatus;
+	int locationHeaderIndex = -1;
+	const char *c;
+	char *p;
+	//printf("HttpStatus is:%d\n", httpStatus);
+	//printf("*responseCode:%d\n", *responseCode);
+	//
+	/*
+		If OK then start saving the response into a file.
+		Other response just print only.
+	*/
+
 
 	switch (httpStatus) {
-	case HTTP_OK:
-		while (!isFinished) { DO_READ(); } 
-		break;
-	case HTTP_DEFAULT:
-		while (!endBlock) { DO_READ(); }
-		break;
-	default:
-		eprintf("Invalid http response. Wont come here one.", socket_cleanup);
+		case HTTP_OK: // Only process finish using the '0'/ html method if receive OK response
+			fprintf(saveFilePtr, "%s", outMsg); // Put first read
+			while (!htmlFinish) { 
+				DO_READ(); 
+				fprintf(saveFilePtr, "%s", outMsg);
+				printf("%s\n", outMsg);
+			} 
+			break;
+		case HTTP_MOVED_PERM:
+			do {
+				locationHeaderIndex = str_index("Location: ", outMsg, 0);
+				if (locationHeaderIndex != -1) {
+					// Copy from the buffer into redirectUrl variable
+					p = redirectUrl;
+					for (c = outMsg + locationHeaderIndex; *c; ++c) {
+						if (*c != '\r') {
+							*p++ = *c;
+						}
+						else {
+							if (*(p + 1) == '\n') {
+								break;
+							}
+						}
+					}
+				}
+				DO_READ();
+			} while (!endBlock);
+
+			break;
+		default: // For all other codes not specified above just read until end block
+			printf("At default\n");
+			while (!endBlock) { DO_READ(); printf("%s\n", outMsg); }
+			//fprintf(stderr, "Received http response code %d, but no function to handle for this code", httpStatus);
 	}
+
+	retCode = SES_SUCESS;
 	
 #undef READ_BLOCK
 
@@ -514,9 +582,12 @@ finish:
  * @param  port Port number to connect using socket
  * @return      Session Enum Code <ses_ret_t>
  */
-static int start_session(const char *zmsg, const char *url, word16 port, const char *savePath) {
+static int start_session(const char *zmsg, const char *url, 
+	word16 port, const char *savePath) {
 
 	ses_ret_t retCode;
+
+	http_res_t httpResponseCode; 
 
 	if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
 		retCode = SES_WOLF_INIT_FAIL; 
@@ -525,9 +596,10 @@ static int start_session(const char *zmsg, const char *url, word16 port, const c
 			
 	WOLFSSL_CTX *ctx;
 	FILE *saveResponseFile;
-
-	char serverResponse[CLI_REPLY_SZ], hostName[URL_LEN]; 
 	
+	char *sendMsg;  
+	char serverResponse[CLI_REPLY_SZ], hostName[URL_LEN], redirectUrl[URL_LEN];
+		
 	/* Init Session */
 	if ((ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
 		retCode = SES_CTX_FAIL; 
@@ -552,22 +624,49 @@ static int start_session(const char *zmsg, const char *url, word16 port, const c
 	
 	if (savePath) {
 		saveResponseFile = fopen(savePath, "w");
-		if (saveResponseFile) {
-			/* Start one one session */
-			retCode = new_session(ctx, zmsg, hostName, port, serverResponse,
-				sizeof(serverResponse), saveResponseFile);
-			/* End of one session */
-
-		} else {
+		if (!saveResponseFile) {
 			retCode = SES_RESP_BAD_SAVE_FILE;
 			eprintf("Unable to open save file", file_cleanup);
-		}		
-	} else 
-		retCode = new_session(ctx, zmsg, hostName, port, serverResponse,
-			sizeof(serverResponse), 0);
-	
-	//printf("serverResponse: \n%s\n", serverResponse);
+		}
+	}
+
+
+	sendMsg = zmsg;
+run_session:
+	// ret code will be SES_
+	retCode = new_session(ctx, sendMsg, hostName, port, serverResponse,
+		sizeof(serverResponse),
+		(savePath) ? saveResponseFile : 0,
+		&httpResponseCode,
+		redirectUrl);
+	//free(sendMsg);
+	printf("@@@@@RET_CODE:%d\n", retCode);
+	if (retCode != SES_SUCESS) {
+		goto end_session;
+	}
+
+	printf("---followredirect:%d\nresponseCode:%d\n", followRedirect, httpResponseCode);
+	printf("RedirectUrl: %s\n", redirectUrl);
+	if (followRedirect && httpResponseCode != HTTP_OK) {
+		if (redirectUrl) {
+			sendMsg = craft_redirect_msg(redirectUrl);
+			printf("-----------------Sendmsg: %s\n", sendMsg);
+		} else {
+			printf("-------------------No redirect Url---------------------\n");
+		}
 		
+	}
+
+	//	
+	//		// recraft GET message and then goto run_session; 
+	//		// Keep repeat procedure
+	//				
+
+end_session:
+
+
+message_free:
+	//if (sendMsg) free(sendMsg);
 file_cleanup:
 	if (saveResponseFile) fclose(saveResponseFile);
 ctx_cleanup:
@@ -576,6 +675,44 @@ wolf_cleanup:
 	wolfSSL_Cleanup();
 finish:
 	return retCode;
+}
+
+/* Sincer location will only give you the full URL with those GET params, manually craft it*/
+static char *craft_redirect_msg(const char *locationUrl) {
+	char msg[BUFFER_SIZE], url[URL_LEN], params[URL_LEN];
+
+	memset(msg, 0, sizeof(msg));
+	memset(url, 0, sizeof(url)); 
+	memset(params, 0, sizeof(params));
+
+
+	const char *p, *host, *path;
+	char *x, *y;
+	
+	x = url;
+	y = params;
+
+	for (p = locationUrl; *p; ++p) {
+		if (*p != '?') {
+			*x = *p;
+			++x;
+		} else {
+			++p;
+			break;
+		}
+	}
+
+	for (; *p; ++p) {
+		*y = *p;
+		++y;
+	}
+	
+	// Check if url has GET params first, then slice
+
+	build_msg_header("GET", url, params, msg, "");
+
+	//printf("OutMsg:%s\n", msg);
+	return msg;
 }
 
 
@@ -632,8 +769,8 @@ if (A == -1) { \
  * @param  outBuffer Buffer to store results
  * @return           If sucesssful will return 1, else 0
  */
-static int build_msg_header(const char *iType, const char *iUrl, 
-	const char *args, char *outBuffer,const char *header) {
+static int build_msg_header(const char *iType, const char *iUrl,  const char *args, 
+	char *outBuffer, const char *header) {
 #define SET_FIRST_CUT(X) \
 if (offset == -1) { \
 offset = str_index(X, iUrl, 1); \
@@ -648,7 +785,7 @@ cutSz = sizeof(X) - 1; \
 	}
 
 	size_t i; 
-	const char *sz, *cut, *host, *path, *p, *extraHeader;
+	const char *sz, *cut, *host, *path, *params, *p, *extraHeader;
 	extraHeader = header;
 
 	char buf[BUFFER_SIZE] = "";
@@ -656,21 +793,18 @@ cutSz = sizeof(X) - 1; \
 	/* Start of extracting host and path */
 	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret = 0;	
 	
-	SET_FIRST_CUT("https://www.");
-	SET_FIRST_CUT("http://www.");
-	SET_FIRST_CUT("www.");
+	SET_FIRST_CUT("https://");
+	SET_FIRST_CUT("http://");
 
 	for (sz = iUrl; *sz; ) ++sz; 
 
-	/*printf("iUrl:%s\noffset %d\ncutSZ:%d\n", iUrl, offset, cutSz);
-	printf("(sz - iUrl):%d\n", (sz - iUrl));*/
 	// If not default value means manage to find cut from above checks
 	cut = (offset != -1)
 		? str_slice_copy(iUrl, cutSz, (sz - iUrl))
 		: str_alloc_copy(iUrl);
 
 	/* URL will split into hostname and path. */
-	if (cut) {		
+	if (cut) {
 		for (sz = cut; *sz; ) ++sz; // Use Sz to get ending of cut
 		firstSlashOffset = str_index("/", cut, 0);
 		if (firstSlashOffset != -1) {
@@ -681,9 +815,9 @@ cutSz = sizeof(X) - 1; \
 			host = str_alloc_copy(cut); // No slash means cut already is host
 			path = str_alloc_copy("/"); // If no slash treat path as /
 		}
-	}
-	else 
+	} else {
 		goto cleanup;
+	}
 	/* End of parsing hostname and path */
 	
 	if (str_eq(HDR_POST, iType, 1)) {
@@ -714,14 +848,16 @@ cutSz = sizeof(X) - 1; \
 		}
 
 		// Start forming the request
-		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_ENDLN)
-		_J(HDR_HOST" ")if (str_index("", host, 1) == -1) { _J("www."); }_J(host)_J("\n")_J(buf1)_J("\n")_J(FLD_ENDLN)
-		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
+		_J("POST ")	_J(path)_J(" "HDR_HTTP" "FLD_END_HEADER)
+		_J(HDR_HOST" ")_J(host)_J(FLD_END_HEADER)
+		_J(buf1)_J("\n")_J(FLD_END_HEADER)
+
+		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_END_HEADER) }		
 		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
 	} else if (str_eq("GET", iType, 1)) {
-		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_ENDLN)
-			_J(HDR_HOST" ")if (str_index("www.", host, 1) == -1) { _J("www."); } _J(host)_J("\n")_J(buf1)_J(FLD_FINISH)
+		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_END_HEADER)
+			_J(HDR_HOST" ") _J(host)_J("\n")_J(buf1)_J(FLD_FINISH)
 		ret = 1;
 	}
 	else {

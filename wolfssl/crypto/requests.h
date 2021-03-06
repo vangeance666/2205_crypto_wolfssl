@@ -53,16 +53,15 @@ static int client_read(WOLFSSL *ssl, char *reply,
 	} while ((err == WOLFSSL_ERROR_WANT_READ));
 
 	if (ret > 0) 
-		reply[ret] = 0; /* null terminate */
+		reply[ret] = 0; 	
 	
-	
-	if (err == 0 && fPtr) { // Will only write if the pointer is not null
-		//printf("Yes got file\n");
-		if (reply) {
-			printf("%s\n", reply);
-			fprintf(fPtr, "%s", reply);
-		}
-	}
+	//if (err == 0 && fPtr) { // Will only write if the pointer is not null
+	//	//printf("Yes got file\n");
+	//	if (reply) {
+	//		printf("%s\n", reply);
+	//		fprintf(fPtr, "%s", reply);
+	//	}
+	//}
 
 	foundIndex = str_index("\r\n\r\n", reply, 1);
 	if (foundIndex != -1) {
@@ -71,34 +70,14 @@ static int client_read(WOLFSSL *ssl, char *reply,
 		/*printf("setFinish: %d\n", (reply[foundIndex - 1] == '0'));*/
 
 	}
-		/*printf("Found slash %d times, R N: %s\n", count, reply);
-		printf("Found at %d of:%s\n", findEnd, reply);
-		printf("Before that is:%c\n", reply[findEnd - 1]);*/
 	
-	
-
-	/*foundIndex = str_index("\r\n\r\n", reply, 1);
-	if (foundIndex != -1) {
-		count++;
-		printf("Found slash %d times, R N: %s\n", count,  reply);
-		printf("Found at %d of:%s\n", foundIndex, reply);
-		printf("Before that is:%c\n", reply[foundIndex - 1]);
-	}*/
-
-	// For identify by html. If no html tag die.
-	/*if ((strstr(reply, "</html>") != NULL)) {
-		printf("found end html tag\n");
-		*setFinish = 1;
-	}*/
 
 	return err;
 }
 
 
 /** Helper function to write Message with GET/POST into SSL object */
-static int client_write(WOLFSSL *ssl, const char *msg, int msgSz, const char *str)
-{
-
+static int client_write(WOLFSSL *ssl, const char *msg, int msgSz, const char *str) {
 	int ret, err;
 	char buffer[WOLFSSL_MAX_ERROR_SZ];
 
@@ -107,19 +86,8 @@ static int client_write(WOLFSSL *ssl, const char *msg, int msgSz, const char *st
 		ret = wolfSSL_write(ssl, msg, msgSz);
 		if (ret <= 0) {
 			err = wolfSSL_get_error(ssl, 0);
-#ifdef WOLFSSL_ASYNC_CRYPT
-			if (err == WC_PENDING_E) {
-				ret = wolfSSL_AsyncPoll(ssl, WOLF_POLL_FLAG_CHECK_HW);
-				if (ret < 0) break;
-			}
-#endif
 		}
-	} while (err == WOLFSSL_ERROR_WANT_WRITE ||
-		err == WOLFSSL_ERROR_WANT_READ
-#ifdef WOLFSSL_ASYNC_CRYPT
-		|| err == WC_PENDING_E
-#endif
-		);
+	} while (err == WOLFSSL_ERROR_WANT_WRITE || err == WOLFSSL_ERROR_WANT_READ);
 	if (ret != msgSz) {
 		printf("SSL_write%s msg error %d, %s\n", str, err,
 			wolfSSL_ERR_error_string(err, buffer));

@@ -1,13 +1,7 @@
-﻿  client.c
-client.c(21): warning C4005: 'WOLFSSL_USER_SETTINGS': macro redefinition
-  client.c(21): note: command-line arguments:  see previous definition of 'WOLFSSL_USER_SETTINGS'
-client.c(3476): warning C4473: 'printf' : not enough arguments passed for format string
-  client.c(3476): note: placeholders and their parameters expect 1 variadic arguments, but 0 were provided
-  client.c(3476): note: the missing variadic argument 1 is required by format string '%s'
-  Generating code
-  334 of 1156 functions (28.9%) were compiled, the rest were copied from previous compilation.
+﻿  Generating code
+  302 of 1156 functions (26.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    135 functions had inline decision re-evaluated but remain unchanged
+    173 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   client.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\client.exe
   client.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\client.pdb (Full PDB)
