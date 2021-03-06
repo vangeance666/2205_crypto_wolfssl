@@ -12,38 +12,52 @@ c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(192): warn
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(192): warning C4101: 'ret': unreferenced local variable
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(226): warning C4102: 'clean_all': unreferenced label
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\verify.h(33): warning C4102: 'finish': unreferenced label
-main.c(245): warning C4013: 'start_session' undefined; assuming extern returning int
-main.c(318): warning C4102: 'finish': unreferenced label
-main.c(343): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-main.c(357): warning C4090: 'function': different 'const' qualifiers
-main.c(340): warning C4101: 'lookupName': unreferenced local variable
-main.c(495): warning C4020: 'client_write': too many actual parameters
-main.c(570): warning C4102: 'finish': unreferenced label
-main.c(452): warning C4101: 'i': unreferenced local variable
-main.c(620): warning C4013: 'get_hostname_from_url' undefined; assuming extern returning int
-main.c(634): warning C4090: '=': different 'const' qualifiers
-main.c(635): warning C4102: 'run_session': unreferenced label
-main.c(668): warning C4102: 'message_free': unreferenced label
-main.c(676): warning C4102: 'finish': unreferenced label
-main.c(689): warning C4101: 'path': unreferenced local variable
-main.c(689): warning C4101: 'host': unreferenced local variable
-main.c(739): warning C4101: 'sz': unreferenced local variable
-main.c(739): warning C4101: 'h': unreferenced local variable
-main.c(739): warning C4101: 'stop': unreferenced local variable
-main.c(830): warning C4018: '<': signed/unsigned mismatch
-main.c(835): warning C4018: '<': signed/unsigned mismatch
-main.c(843): warning C4018: '<': signed/unsigned mismatch
-main.c(848): warning C4018: '<': signed/unsigned mismatch
-main.c(872): warning C4090: 'function': different 'const' qualifiers
-main.c(873): warning C4090: 'function': different 'const' qualifiers
-main.c(874): warning C4090: 'function': different 'const' qualifiers
-main.c(788): warning C4101: 'params': unreferenced local variable
+main.c(135): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(138): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(141): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(269): warning C4013: 'start_session' undefined; assuming extern returning int
+main.c(343): warning C4102: 'finish': unreferenced label
+main.c(368): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+main.c(382): warning C4090: 'function': different 'const' qualifiers
+main.c(365): warning C4101: 'lookupName': unreferenced local variable
+main.c(520): warning C4020: 'client_write': too many actual parameters
+main.c(601): warning C4102: 'finish': unreferenced label
+main.c(477): warning C4101: 'i': unreferenced local variable
+main.c(658): warning C4090: '=': different 'const' qualifiers
+main.c(659): warning C4090: '=': different 'const' qualifiers
+main.c(662): warning C4013: 'get_hostname_from_url' undefined; assuming extern returning int
+main.c(672): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[2048]'
+main.c(672): warning C4024: 'new_session': different types for formal and actual parameter 9
+main.c(686): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(660): warning C4102: 'run_session': unreferenced label
+main.c(700): warning C4102: 'message_free': unreferenced label
+main.c(708): warning C4102: 'finish': unreferenced label
+main.c(715): warning C4029: declared formal parameter list different from definition
+main.c(740): warning C4090: '=': different 'const' qualifiers
+main.c(751): warning C4090: '=': different 'const' qualifiers
+main.c(775): warning C4090: '=': different 'const' qualifiers
+main.c(776): warning C4090: '=': different 'const' qualifiers
+main.c(787): warning C4090: '=': different 'const' qualifiers
+main.c(793): warning C4090: '=': different 'const' qualifiers
+main.c(799): warning C4090: '=': different 'const' qualifiers
+main.c(770): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'const char *'
+main.c(725): warning C4101: 'path': unreferenced local variable
+main.c(725): warning C4101: 'host': unreferenced local variable
+main.c(845): warning C4101: 'sz': unreferenced local variable
+main.c(845): warning C4101: 'h': unreferenced local variable
+main.c(845): warning C4101: 'stop': unreferenced local variable
+main.c(935): warning C4018: '<': signed/unsigned mismatch
+main.c(940): warning C4018: '<': signed/unsigned mismatch
+main.c(948): warning C4018: '<': signed/unsigned mismatch
+main.c(954): warning C4018: '<': signed/unsigned mismatch
+main.c(979): warning C4090: 'function': different 'const' qualifiers
+main.c(980): warning C4090: 'function': different 'const' qualifiers
+main.c(981): warning C4090: 'function': different 'const' qualifiers
+main.c(891): warning C4101: 'params': unreferenced local variable
   Generating code
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(460): warning C4700: uninitialized local variable 'ssl' used
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(254): warning C4700: uninitialized local variable 'ret' used
-  3 of 1075 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+  2 of 1076 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    4 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.exe
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\wolfssl\Release\crypto.pdb (Full PDB)

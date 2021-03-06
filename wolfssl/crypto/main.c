@@ -41,6 +41,12 @@
 #define CLI_REPLY_SZ    128
 #define URL_LEN 2048
 
+#define SKIP_URL_FRONT(A, B, C, X) \
+if (A == -1) { \
+	A = str_index(X, C, 1); \
+	B = sizeof(X) - 1; \
+}
+
 #define crlPemDir "../../certs/crl"
 
 #define MOZILLA_ROOT "./certs/mozilla-roots-cas.pem"
@@ -113,14 +119,29 @@ typedef enum {
 } http_res_t;
 
 
-static char request[] = "";
+static char g_request[] = "";
+static int g_printPeerCert = 0;
+static int g_followRedirect = 1;
+
 static int cert_show_details(const char *certPath);
 static int build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer,const char *header);
-
-static int printPeerCert = 0;
-static int followRedirect = 1;
 static void print_help();
 static char *craft_redirect_msg(const char *locationUrl);
+
+/* Test Against wiki example to check reliability */
+void test_case_http() {
+	char *test;
+
+	test = craft_redirect_msg("https://www.example.com/index.html", "https://www.example.org/index.php");
+	printf("testout1:%s\n", test);
+
+	test = craft_redirect_msg("https://www.example.com/blog/all", "/articles/");
+	printf("testout2:%s\n", test);
+
+	test = craft_redirect_msg("https://www.example.com/blog/latest?hehe=12312", "2020/zoo");
+	printf("testout3:%s\n", test);
+
+}
 
 int main(int argc, char **argv)
 {
@@ -139,6 +160,10 @@ int main(int argc, char **argv)
 
 	char *header;
 	
+	test_case_http();
+
+	return 0;
+
 	/*char *test;
 
 	test = craft_redirect_msg("https://www.youtube.com/youtubei/v1/guide?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8");
@@ -194,7 +219,7 @@ int main(int argc, char **argv)
 				print_help();
 				break;
 			case 'L':
-				followRedirect = 1;
+				g_followRedirect = 1;
 				break;
 			default:
 				print_help();
@@ -241,12 +266,12 @@ int main(int argc, char **argv)
 				goto finish;
 			}
 			
-			printf("ajsndkasndk _____> %s",request);
 			start_session(request,
 				host,
 				HTTPS_PORT,
 				(saveRequestPath == "")
 				? 0 : saveRequestPath);
+
 			break;
 	}
 
@@ -441,7 +466,7 @@ static http_res_t http_status_from_buffer(const char *buf) {
  * @param  port     Port Number to connect using socket
  * @param  outMsg   Buffer to store server reply
  * @param  outMsgSz Buffer Size
- * @param  saveResponse 1 to save server GET/POST Response to a local file
+ * @param  saveResponse Set 1 to save server GET/POST Response to a local file
  * @return          Session enum status code <ses_ret_t>
  */
 static ses_ret_t new_session(WOLFSSL_CTX *ctx, const char *zmsg, 
@@ -507,7 +532,6 @@ if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &htmlFinish, &endBlock, sav
 		depending on situation/code	then continue reading 
 	*/
 	DO_READ(); 
-	printf("%s\n", outMsg);
 
 	httpStatus = http_status_from_buffer(outMsg); *responseCode = httpStatus;
 	int locationHeaderIndex = -1;
@@ -532,25 +556,32 @@ if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &htmlFinish, &endBlock, sav
 			} 
 			break;
 		case HTTP_MOVED_PERM:
-			do {
+			printf("%s", outMsg);
+
+			if (endBlock) {
+				goto socket_cleanup;
+			}
+
+			do {								
 				locationHeaderIndex = str_index("Location: ", outMsg, 0);
 				if (locationHeaderIndex != -1) {
 					// Copy from the buffer into redirectUrl variable
 					p = redirectUrl;
-					for (c = outMsg + locationHeaderIndex; *c; ++c) {
+					for (c = outMsg + locationHeaderIndex + sizeof("Location: ") - 1; *c; ++c) {
 						if (*c != '\r') {
 							*p++ = *c;
-						}
-						else {
-							if (*(p + 1) == '\n') {
+						} else {
+							if (*(c + 1) == '\n') {
 								break;
 							}
 						}
 					}
 				}
 				DO_READ();
-			} while (!endBlock);
+				printf("%s", outMsg);
 
+			} while (!endBlock);
+			printf("\n");
 			break;
 		default: // For all other codes not specified above just read until end block
 			printf("At default\n");
@@ -597,7 +628,7 @@ static int start_session(const char *zmsg, const char *url,
 	WOLFSSL_CTX *ctx;
 	FILE *saveResponseFile;
 	
-	char *sendMsg;  
+	char *sendMsg, *prevUrl;  
 	char serverResponse[CLI_REPLY_SZ], hostName[URL_LEN], redirectUrl[URL_LEN];
 		
 	/* Init Session */
@@ -614,13 +645,7 @@ static int start_session(const char *zmsg, const char *url,
 	/* End of init Session*/
 	
 	// Set to always verify peer, will goto callback no matter what. (Uncomment once needed)
-	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, printPeerCert ? myVerify : 0);
-
-
-	if (!get_hostname_from_url(url, hostName)) {
-		retCode = SES_EXTRACT_HOSTNAME_FAIL;
-		eprintf("Unable to get hostname from full url path", ctx_cleanup);
-	}
+	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_PEER, g_printPeerCert ? myVerify : 0);
 	
 	if (savePath) {
 		saveResponseFile = fopen(savePath, "w");
@@ -630,34 +655,41 @@ static int start_session(const char *zmsg, const char *url,
 		}
 	}
 
-
+	prevUrl = url;
 	sendMsg = zmsg;
 run_session:
+
+	if (!get_hostname_from_url(prevUrl, hostName)) {
+		retCode = SES_EXTRACT_HOSTNAME_FAIL;
+		eprintf("Unable to get hostname from full url path", file_cleanup);
+
+	}
 	// ret code will be SES_
 	retCode = new_session(ctx, sendMsg, hostName, port, serverResponse,
 		sizeof(serverResponse),
 		(savePath) ? saveResponseFile : 0,
 		&httpResponseCode,
-		redirectUrl);
-	//free(sendMsg);
+		&redirectUrl);
+
 	printf("@@@@@RET_CODE:%d\n", retCode);
+
 	if (retCode != SES_SUCESS) {
 		goto end_session;
 	}
 
-	printf("---followredirect:%d\nresponseCode:%d\n", followRedirect, httpResponseCode);
-	printf("RedirectUrl: %s\n", redirectUrl);
-	if (followRedirect && httpResponseCode != HTTP_OK) {
+	printf("---RedirectUrl: %s\n", redirectUrl);
+
+	if (g_followRedirect && httpResponseCode != HTTP_OK) {
+		// First handle for the 3 types of location header,
 		if (redirectUrl) {
-			sendMsg = craft_redirect_msg(redirectUrl);
+			printf("Prevurl:%s\n", prevUrl);
+			sendMsg = craft_redirect_msg(prevUrl, redirectUrl);
 			printf("-----------------Sendmsg: %s\n", sendMsg);
-		} else {
-			printf("-------------------No redirect Url---------------------\n");
 		}
-		
 	}
 
-	//	
+
+
 	//		// recraft GET message and then goto run_session; 
 	//		// Keep repeat procedure
 	//				
@@ -677,41 +709,119 @@ finish:
 	return retCode;
 }
 
-/* Sincer location will only give you the full URL with those GET params, manually craft it*/
-static char *craft_redirect_msg(const char *locationUrl) {
-	char msg[BUFFER_SIZE], url[URL_LEN], params[URL_LEN];
+
+// https://en.wikipedia.org/wiki/HTTP_location
+/* Since location will only give you the full URL with those GET params, manually craft it */
+static char *craft_redirect_msg(const char *prevUrl, const char *locationUrl) {
+
+	if (!prevUrl || !locationUrl) {
+		printf("smth is null\n");
+		return 0;
+	}
+		
+	printf("####inside prevUrl:%s\nlocationurl:%s\n", prevUrl, locationUrl);
+
+	char msg[BUFFER_SIZE], url[URL_LEN], params[URL_LEN], *x, *y, *p;
+	const char *host, *path, *lastSlash, *paramsStart = 0;
+	int locFirstIndex = -1, locSz=0, prevFirstIndex = -1, prevSz = 0; // To skip the https and http stuffs
+
+	SKIP_URL_FRONT(locFirstIndex, locSz, locationUrl, "https://");
+	SKIP_URL_FRONT(locFirstIndex, locSz, locationUrl, "http://");
 
 	memset(msg, 0, sizeof(msg));
 	memset(url, 0, sizeof(url)); 
 	memset(params, 0, sizeof(params));
 
-
-	const char *p, *host, *path;
-	char *x, *y;
-	
 	x = url;
 	y = params;
 
-	for (p = locationUrl; *p; ++p) {
-		if (*p != '?') {
-			*x = *p;
-			++x;
-		} else {
-			++p;
+
+	// Get pointer to start of ? from previous URL used.
+	for (p = prevUrl; *p; ++p) {
+		if (*p == '?' && *(p + 1) != 0) {
+			paramsStart = p + 1;
 			break;
 		}
 	}
 
-	for (; *p; ++p) {
-		*y = *p;
-		++y;
+	printf("First Index: %d\n", locFirstIndex);
+
+	if (locFirstIndex != -1) {
+		// Full url just process using locationUrl
+		p = locationUrl + locFirstIndex;
+		for (; *p; ++p) {
+			if (*p != '?') {
+				*x++ = *p; // Copy over to url buffer
+			} else {
+				x = params;
+			}
+		} 
+	} else if (*locationUrl == '/') { // absolute path, use with prev url
+		// Absolute path use the prev url host then add behind with the abs info
+		// See if prev url has get parameters
+
+		printf("Inside absolute path mode\n");
+
+		SKIP_URL_FRONT(prevFirstIndex, prevSz, prevUrl, "https://");
+		SKIP_URL_FRONT(prevFirstIndex, prevSz, prevUrl, "http://");
+
+		// Get pointer to where to start for prevUrl get parameters	
+
+		printf("Params start: %d\n", paramsStart);
+		printf("Prev url : %s\n", prevUrl);
+		printf("Prev sz: %d\n", prevSz);
+
+		// Only copy until first slash '/' then use the locationUrl
+		for (p = prevUrl + prevSz; *p && *p != '/'; *x++ = *p++);
+		for (p = locationUrl; *p; *x++ = *p++); 
+
+		printf("ABS MODE p:%s\n", url);
+
+		if (paramsStart) for (; *paramsStart; *x++ = *paramsStart++);
+			
+		//Finally put back the params, simplify later
+		
+
+	} else { // rel path use with prev url, replace the 
+		printf("!!!!Relative mode\n");
+		for (p = prevUrl; *p; ++p) {
+			if (*p == '/') {
+				lastSlash = p;
+			}
+		}
+
+		for (p = prevUrl; *p; ++p) {
+			*x++ = *p;
+			if (p == lastSlash) {
+				break;
+			}
+		}
+		for (p = locationUrl; *p; *x++ = *p++);
+		if (paramsStart) for (; *paramsStart; *x++ = *paramsStart++);
+
+		
 	}
+
 	
+	printf("========Before build msg, url:%s==========\nparams:%s\n", url, params);
+
 	// Check if url has GET params first, then slice
+
+	printf("Params star:%c\n ", *params);
+
+	if (*params == 0) {
+		printf("Star really is empty\n");
+	}
 
 	build_msg_header("GET", url, params, msg, "");
 
-	//printf("OutMsg:%s\n", msg);
+
+
+
+
+	printf("OutMsg:%s\n", msg);
+
+#undef SKIP_HTTP_HEADERS
 	return msg;
 }
 
@@ -726,24 +836,23 @@ static char *craft_redirect_msg(const char *locationUrl) {
  * @return         If successful 1, else 0
  */
 static int get_hostname_from_url(const char *url, char *outHost) {
-#define GET_FIRST_INDEX(A, B, C, X) \
-if (A == -1) { \
-	A = str_index(X, C, 1); \
-	B = sizeof(X) - 1; \
-}
+
 
 	if (!url || !outHost)
 		return 0;
 
-	int length = 0, found = -1, firstIndex = 0, i = -1;
+	int length = 0, found = -1, foundSz = 0, i = -1;
 	const char *sz, *p = url, *h, *stop;
 
-	GET_FIRST_INDEX(found, firstIndex, url, "https://www.")
-	GET_FIRST_INDEX(found, firstIndex, url, "http://www.");
-	GET_FIRST_INDEX(found, firstIndex, url, "www.");
+	/*SKIP_URL_FRONT(found, foundSz, url, "https://www.")
+	SKIP_URL_FRONT(found, foundSz, url, "http://www.");*/
+	//SKIP_URL_FRONT(found, foundSz, url, "www.");
+	SKIP_URL_FRONT(found, foundSz, url, "https://")
+	SKIP_URL_FRONT(found, foundSz, url, "http://");
+	
 
 	if (found == 0)
-		p += firstIndex;
+		p += foundSz;
 
 	for (; *p; ++p) {
 		if (*p == '/' || *p == '\\') {
@@ -754,7 +863,6 @@ if (A == -1) { \
 		}
 	} *outHost = 0;
 
-#undef GET_FIRST_INDEX
 	return 1;
 }
 
@@ -765,17 +873,12 @@ if (A == -1) { \
  * @param  iType     String containing POST or GET
  * @param  iUrl      URL, For e.g. youtube.com or youtube.com/results
  *                   Slicing https and http will be done.
- * @param  args      GET or POST fields
+ * @param  args      GET or POST fields. Please input 0 if nothing
  * @param  outBuffer Buffer to store results
  * @return           If sucesssful will return 1, else 0
  */
 static int build_msg_header(const char *iType, const char *iUrl,  const char *args, 
 	char *outBuffer, const char *header) {
-#define SET_FIRST_CUT(X) \
-if (offset == -1) { \
-offset = str_index(X, iUrl, 1); \
-cutSz = sizeof(X) - 1; \
-}	
 #define _J(X) strcat(outBuffer, X);
 
 	// Check if is not empty
@@ -793,8 +896,11 @@ cutSz = sizeof(X) - 1; \
 	/* Start of extracting host and path */
 	int offset = -1, cutSz = -1, firstSlashOffset = -1, ret = 0;	
 	
-	SET_FIRST_CUT("https://");
-	SET_FIRST_CUT("http://");
+	SKIP_URL_FRONT(offset, cutSz, iUrl, "https://");
+	SKIP_URL_FRONT(offset, cutSz, iUrl, "http://");
+
+	/*SET_FIRST_CUT("https://");
+	SET_FIRST_CUT("http://");*/
 
 	for (sz = iUrl; *sz; ) ++sz; 
 
@@ -803,6 +909,7 @@ cutSz = sizeof(X) - 1; \
 		? str_slice_copy(iUrl, cutSz, (sz - iUrl))
 		: str_alloc_copy(iUrl);
 
+	printf("Cut:%s\n", cut);
 	/* URL will split into hostname and path. */
 	if (cut) {
 		for (sz = cut; *sz; ) ++sz; // Use Sz to get ending of cut
@@ -810,8 +917,7 @@ cutSz = sizeof(X) - 1; \
 		if (firstSlashOffset != -1) {
 			host = str_slice_copy(cut, 0, firstSlashOffset); // Host slice till before '/' offset
 			path = str_slice_copy(cut, firstSlashOffset, sz - (cut)); // Host 
-		}
-		else {
+		} else {
 			host = str_alloc_copy(cut); // No slash means cut already is host
 			path = str_alloc_copy("/"); // If no slash treat path as /
 		}
@@ -841,6 +947,7 @@ cutSz = sizeof(X) - 1; \
 				if (*p == '&') {
 					for (i = beforeIndex; i < (p - extraHeader); )
 						buf1[curIndex++] = extraHeader[i++];
+						buf1[curIndex++] = '\r';
 						buf1[curIndex++] = '\n';
 						beforeIndex = (p - extraHeader) + 1;
 				}
@@ -852,11 +959,11 @@ cutSz = sizeof(X) - 1; \
 		_J(HDR_HOST" ")_J(host)_J(FLD_END_HEADER)
 		_J(buf1)_J("\n")_J(FLD_END_HEADER)
 
-		if (args && args != "") { _J(buf)_J(FLD_FINISH) } else { _J(FLD_END_HEADER) }		
+		if (args && args != "" && args != 0) { _J(buf)_J(FLD_FINISH) } else { _J(FLD_END_HEADER) }		
 		//if (args) { _J(args)_J(FLD_FINISH) } else { _J(FLD_ENDLN) }		
 		ret = 1;
 	} else if (str_eq("GET", iType, 1)) {
-		_J("GET ")_J(path) if (args) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_END_HEADER)
+		_J("GET ")_J(path) if (args && args != "" && *args != 0) { if (*args != '?') { _J("?")_J(args) } else { _J(args) } } _J(" "HDR_HTTP" "FLD_END_HEADER)
 			_J(HDR_HOST" ") _J(host)_J("\n")_J(buf1)_J(FLD_FINISH)
 		ret = 1;
 	}
@@ -868,7 +975,6 @@ cleanup:
 #undef _J
 #undef FLD_FINISH
 #undef FLD_ENDLN
-#undef SET_FIRST_CUT
 	
 if (host) free(host);
 if (path) free(path);
