@@ -65,8 +65,8 @@ main.c(934): warning C4090: 'function': different 'const' qualifiers
 main.c(935): warning C4090: 'function': different 'const' qualifiers
 main.c(846): warning C4101: 'params': unreferenced local variable
   Generating code
-c:\users\user\desktop\2205_crypto_wolfssl\crypto\main.c(782): warning C4172: returning address of local variable or temporary: msg
-  1 of 1104 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+c:\users\user\desktop\2205_crypto_wolfssl\crypto\main.c(477): warning C4700: uninitialized local variable 'ssl' used
+  2 of 1104 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
