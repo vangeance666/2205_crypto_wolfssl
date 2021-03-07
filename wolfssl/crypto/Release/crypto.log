@@ -12,61 +12,66 @@ c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(192): warn
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(192): warning C4101: 'ret': unreferenced local variable
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\certfields.h(226): warning C4102: 'clean_all': unreferenced label
 c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\verify.h(33): warning C4102: 'finish': unreferenced label
-main.c(135): warning C4020: 'craft_redirect_msg': too many actual parameters
-main.c(138): warning C4020: 'craft_redirect_msg': too many actual parameters
-main.c(141): warning C4020: 'craft_redirect_msg': too many actual parameters
-main.c(255): warning C4013: 'start_session' undefined; assuming extern returning int
-main.c(271): warning C4129: '_': unrecognized character escape sequence
-main.c(272): warning C4129: '_': unrecognized character escape sequence
-main.c(272): warning C4129: ' ': unrecognized character escape sequence
-main.c(273): warning C4129: '_': unrecognized character escape sequence
-main.c(273): warning C4129: ' ': unrecognized character escape sequence
-main.c(274): warning C4129: '_': unrecognized character escape sequence
-main.c(275): warning C4129: '/': unrecognized character escape sequence
-main.c(336): warning C4102: 'finish': unreferenced label
-main.c(361): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-main.c(374): warning C4090: 'function': different 'const' qualifiers
-main.c(358): warning C4101: 'lookupName': unreferenced local variable
-main.c(514): warning C4020: 'client_write': too many actual parameters
-main.c(585): warning C4102: 'finish': unreferenced label
-main.c(468): warning C4101: 'i': unreferenced local variable
-main.c(654): warning C4013: 'get_hostname_from_url' undefined; assuming extern returning int
-main.c(663): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[2048]'
-main.c(663): warning C4024: 'new_session': different types for formal and actual parameter 9
-main.c(676): warning C4020: 'craft_redirect_msg': too many actual parameters
-main.c(676): warning C4090: 'function': different 'const' qualifiers
-main.c(678): warning C4020: 'craft_redirect_msg': too many actual parameters
-main.c(678): warning C4090: 'function': different 'const' qualifiers
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\misc.h(6): warning C4476: 'fprintf' : unknown type field character '(' in format specifier
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\misc.h(6): warning C4476: 'fprintf' : unknown type field character '@' in format specifier
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\misc.h(6): warning C4476: 'fprintf' : unknown type field character '&' in format specifier
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\misc.h(6): warning C4476: 'fprintf' : unknown type field character '%' in format specifier
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\misc.h(6): warning C4476: 'fprintf' : unknown type field character '/' in format specifier
+main.c(136): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(139): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(142): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(259): warning C4013: 'start_session' undefined; assuming extern returning int
+main.c(275): warning C4129: '_': unrecognized character escape sequence
+main.c(276): warning C4129: '_': unrecognized character escape sequence
+main.c(276): warning C4129: ' ': unrecognized character escape sequence
+main.c(277): warning C4129: '_': unrecognized character escape sequence
+main.c(277): warning C4129: ' ': unrecognized character escape sequence
+main.c(278): warning C4129: '_': unrecognized character escape sequence
+main.c(279): warning C4129: '/': unrecognized character escape sequence
+main.c(341): warning C4102: 'finish': unreferenced label
+main.c(366): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+main.c(379): warning C4090: 'function': different 'const' qualifiers
+main.c(363): warning C4101: 'lookupName': unreferenced local variable
+main.c(519): warning C4020: 'client_write': too many actual parameters
+main.c(590): warning C4102: 'finish': unreferenced label
+main.c(473): warning C4101: 'i': unreferenced local variable
+main.c(659): warning C4013: 'get_hostname_from_url' undefined; assuming extern returning int
+main.c(668): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[2048]'
+main.c(668): warning C4024: 'new_session': different types for formal and actual parameter 9
 main.c(681): warning C4020: 'craft_redirect_msg': too many actual parameters
 main.c(681): warning C4090: 'function': different 'const' qualifiers
-main.c(689): warning C4090: 'function': different 'const' qualifiers
-main.c(629): warning C4102: 'start_ctx': unreferenced label
-main.c(688): warning C4102: 'message_free': unreferenced label
-main.c(696): warning C4102: 'finish': unreferenced label
-main.c(703): warning C4029: declared formal parameter list different from definition
-main.c(728): warning C4090: '=': different 'const' qualifiers
-main.c(737): warning C4090: '=': different 'const' qualifiers
-main.c(751): warning C4090: '=': different 'const' qualifiers
-main.c(752): warning C4090: '=': different 'const' qualifiers
-main.c(759): warning C4090: '=': different 'const' qualifiers
+main.c(683): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(683): warning C4090: 'function': different 'const' qualifiers
+main.c(686): warning C4020: 'craft_redirect_msg': too many actual parameters
+main.c(686): warning C4090: 'function': different 'const' qualifiers
+main.c(694): warning C4090: 'function': different 'const' qualifiers
+main.c(634): warning C4102: 'start_ctx': unreferenced label
+main.c(693): warning C4102: 'message_free': unreferenced label
+main.c(701): warning C4102: 'finish': unreferenced label
+main.c(708): warning C4029: declared formal parameter list different from definition
+main.c(733): warning C4090: '=': different 'const' qualifiers
+main.c(742): warning C4090: '=': different 'const' qualifiers
+main.c(756): warning C4090: '=': different 'const' qualifiers
+main.c(757): warning C4090: '=': different 'const' qualifiers
 main.c(764): warning C4090: '=': different 'const' qualifiers
-main.c(771): warning C4090: '=': different 'const' qualifiers
-main.c(713): warning C4101: 'path': unreferenced local variable
-main.c(713): warning C4101: 'host': unreferenced local variable
-main.c(816): warning C4101: 'sz': unreferenced local variable
-main.c(816): warning C4101: 'h': unreferenced local variable
-main.c(816): warning C4101: 'stop': unreferenced local variable
-main.c(901): warning C4018: '<': signed/unsigned mismatch
+main.c(769): warning C4090: '=': different 'const' qualifiers
+main.c(776): warning C4090: '=': different 'const' qualifiers
+main.c(718): warning C4101: 'path': unreferenced local variable
+main.c(718): warning C4101: 'host': unreferenced local variable
+main.c(821): warning C4101: 'sz': unreferenced local variable
+main.c(821): warning C4101: 'h': unreferenced local variable
+main.c(821): warning C4101: 'stop': unreferenced local variable
 main.c(906): warning C4018: '<': signed/unsigned mismatch
-main.c(914): warning C4018: '<': signed/unsigned mismatch
-main.c(920): warning C4018: '<': signed/unsigned mismatch
-main.c(947): warning C4090: 'function': different 'const' qualifiers
-main.c(948): warning C4090: 'function': different 'const' qualifiers
-main.c(949): warning C4090: 'function': different 'const' qualifiers
-main.c(860): warning C4101: 'params': unreferenced local variable
+main.c(911): warning C4018: '<': signed/unsigned mismatch
+main.c(919): warning C4018: '<': signed/unsigned mismatch
+main.c(925): warning C4018: '<': signed/unsigned mismatch
+main.c(952): warning C4090: 'function': different 'const' qualifiers
+main.c(953): warning C4090: 'function': different 'const' qualifiers
+main.c(954): warning C4090: 'function': different 'const' qualifiers
+main.c(865): warning C4101: 'params': unreferenced local variable
   Generating code
-c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(265): warning C4700: uninitialized local variable 'ret' used
-  2 of 1075 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+c:\users\user\desktop\2205_crypto_wolfssl\wolfssl\crypto\main.c(269): warning C4700: uninitialized local variable 'ret' used
+  2 of 1076 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

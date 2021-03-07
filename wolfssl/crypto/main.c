@@ -32,6 +32,7 @@
 #include "requests.h"
 #include "verify.h"
 #include "argparse.h"
+#include "misc.h"
 
 #define BUFFER_SIZE 2048
 
@@ -162,7 +163,7 @@ int main(int argc, char **argv)
 
 	int opt, mode;
  
-	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s:a;L")) != -1) {
+	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s:a;LX")) != -1) {
 		switch (opt)
 		{
 			case 'a':
@@ -208,6 +209,9 @@ int main(int argc, char **argv)
 				break;
 			case 'L':
 				g_followRedirect = 1;
+				break;
+			case 'X':
+				print_secret();
 				break;
 			default:
 				print_help();
@@ -284,6 +288,7 @@ static void print_help() {
 		"-a <request header> Additional request header, delimit using '&' E.g. \"Connection: close&Content - Length : 0\"\n"
 		"-S		Prints peer cert details when connected to them.\n"
 		"-L		Follows redirect until receive HTTP 200 response.\n"
+		"-X		Prints Secret\n"
 	);
 }
 
