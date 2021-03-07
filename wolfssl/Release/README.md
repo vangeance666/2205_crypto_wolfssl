@@ -74,10 +74,13 @@ Intermediate verify -> leaf cert
 ![Alt text](Screenshots/GET%20without%20Redirect.png?raw=true "Title")
 
 ## Example of Using GET with Redirect Functionality
+As we can see from the above image, without using the redirect functionality, if a webpage has been moved permanently <br/>
+we are unable to follow the redirect. Hence, utilising the '-L' option, we are able to send multiple GET/POST to <br/>
+follow the redirection.
 ![Alt text](Screenshots/With%20redirect.png?raw=true "Title")
 
 ## Callback Function
-Connect and print all peer certification details using tne callback function.
+Connect and print all peer certification details using the callback function.
 
 ![Alt text](Screenshots/callback%20function.png?raw=true "Title")
 
