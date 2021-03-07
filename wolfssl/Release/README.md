@@ -7,9 +7,10 @@
 3. Option to print peer cert details when established connection.
 4. Sending of GET & POST messages to peer with SSL (peer certs are verified against our CA Certs from https://wiki.mozilla.org/CA).
 5. User able to craft their own GET & POST parameters to send to peer.
-6. :star2: Able to follow website redirect response. 
+6. :star2: Able to follow website redirect response. Complaint to https://en.wikipedia.org/wiki/HTTP_location
 
-# Structure
+
+# 🔥 Structure
 Files within in *crypto* project.
 
 | Filename | Description |
@@ -21,7 +22,7 @@ Files within in *crypto* project.
 | globals.h | Contains macros, definitions return codes, used throughout the whole program. |
 | requests.h | Contains helper functions which utilizes wolfSSL_read and wolfSSL_write to interact with server/website using GET/POST messages. |
 | verify.h | Contains all required functions which will be used for verifying peer certs. 
-| main.c | Main program. (All procedures are here)  |
+| main.c | Main program. (All procedures are here). Contains our own GET/POST msg builder. |
 
 
 # 🛠️ Usage
@@ -111,7 +112,18 @@ Connect to peer and save the HTML output to a file to render it on a browser
 ## Viewing the saved HTML output
 ![Alt text](Screenshots/open%20page.png?raw=true "Title")
 
-# Brief explaination of functionalities
+# 🎶 Important functions
+Key functions to look at:
+
+| File | Functions |
+| --- | --- |
+| main.c | new_session, start_session, craft_redirect_msg, get_hostname_from_url, build_msg_header |
+| verify.h | cert_manual_verify |
+| certfields.h | print_peer_details, show_pkey_details, show_x509_bio_info, show_x509_pub_key_info, show_x509_name_info, show_x509_info |
+| requests.h | client_read, client_write |
+
+
 The codes are commented heavily to facilitate understanding of the whole code structure. Check [here](#structure) to know where to mark! 
+
 
 
