@@ -1,7 +1,15 @@
-# Loading code up on Visual Studio
+# ⚡ Loading code up on Visual Studio
 - Launch wolfssl.sln at root folder with Visual Studio. The codes are within *crypto* project.
 
-# Structure
+# ✨ Functionalities
+1. Manual verification of two certs. 
+2. Printing of desired cert details (Modulus and Exponent included).
+3. Option to print peer cert details when established connection.
+4. Sending of GET & POST messages to peer with SSL (peer certs are verified against our CA Certs from https://wiki.mozilla.org/CA).
+5. User able to craft their own GET & POST parameters to send to peer.
+6. :star2: Able to follow website redirect response. 
+
+# 🔥 Structure
 Files within in *crypto* project.
 
 | Filename | Description |
@@ -16,7 +24,7 @@ Files within in *crypto* project.
 | main.c | Main program. (All procedures are here)  |
 
 
-# Usage
+# 🛠️ Usage
 1. On your windows command prompt, navigate to:
 > Release/
 2. A crypto.exe should have be compiled for you. You can build yourself if you want with VSS.
@@ -31,38 +39,38 @@ Files within in *crypto* project.
 -V [path]       Intermediate cert file [path] to be verified by CA cert specified.
 -s [path]       File path of where server's response using GET/POST will be saved into.
 -a [request header] Additional request header, delimit using '&' E.g. "Connection: close&Content-Length: 0"
-
+-S 				Prints peer cert details when connected to them.
+-L              Follows redirect until receive HTTP 200 response.
 </pre>
 
-
-# Usage Examples
-
-## Printing cert details
+## ❄️ Examples
+### Printing cert details
 `➜ crypto.exe -p "youtube-server.pem"`
 
-## Verify cert
+### Verify cert
 `➜ crypto.exe -v -C "CA-Cert.pem" -V "cert-toverify.pem`
 
-## Sending messages GET/POST via SSL
-### Default (Requests for root path)
+### Sending messages GET/POST via SSL
+#### Default (Requests for root path)
 `➜ crypto.exe -h youtube.com -G` 
 
-### Saving response to file
+#### Saving response to file
 `➜ crypto.exe -h reddit.com -G -s "reddit-page.html"`
 
-### Follow redirects mode
+#### Follow redirects mode
 `➜ crypto.exe -h reddit.com -G -L`
 
-### Combining with saving response to html so you can view the output!
+#### Combining with saving response to html so you can view the output!
 `➜ crypto.exe -h reddit.com -G -L -s "reddit-redirected.html"`
 
-### Parameters usage
+#### Parameters usage
 `➜ crypto.exe -h youtube.com/results -G search_query=ihate+school`
 
-### Sending POST message via SSL
+#### Sending POST message via SSL
 `➜ crypto.exe -h "www.allforyou.sg/login" -P "Email=test@test.com&Password=pass" -a "content-length: 0"`
 
-# Output
+
+# 🍀 Output
 ## Help Menu
 ![Alt text](Screenshots/Help%20Menu.png?raw=true "Title")
 
@@ -102,4 +110,7 @@ Connect to peer and save the HTML output to a file to render it on a browser
 
 ## Viewing the saved HTML output
 ![Alt text](Screenshots/open%20page.png?raw=true "Title")
+
+# Brief explaination of functionalities
+The codes are commented heavily to facilitate understanding of the whole code structure. Check [here](# Structure) to know where to read. 
 
