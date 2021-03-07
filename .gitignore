@@ -50,3 +50,5 @@ Module.symvers
 Mkfile.old
 dkms.conf
 wolfssl/wolfssl.VC.VC.opendb
+*.tlog
+*.cache
