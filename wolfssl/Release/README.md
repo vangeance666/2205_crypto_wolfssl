@@ -76,7 +76,7 @@ Intermediate verify -> leaf cert
 ## Example of Using GET with Redirect Functionality
 As we can see from the above image, without using the redirect functionality, if a webpage has been moved permanently <br/>
 we are unable to follow the redirect. Hence, utilising the '-L' option, we are able to send multiple GET/POST to <br/>
-follow the redirection.
+follow the redirection. <br/>
 ![Alt text](Screenshots/With%20redirect.png?raw=true "Title")
 
 ## Callback Function
