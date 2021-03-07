@@ -9,7 +9,7 @@
 5. User able to craft their own GET & POST parameters to send to peer.
 6. :star2: Able to follow website redirect response. 
 
-# 🔥 Structure
+# Structure
 Files within in *crypto* project.
 
 | Filename | Description |
@@ -113,4 +113,5 @@ Connect to peer and save the HTML output to a file to render it on a browser
 
 # Brief explaination of functionalities
 The codes are commented heavily to facilitate understanding of the whole code structure. Check [here](#structure) to know where to mark! 
+
 
