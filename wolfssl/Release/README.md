@@ -9,7 +9,7 @@
 5. User able to craft their own GET & POST parameters to send to peer.
 6. :star2: Able to follow website redirect response. 
 
-# 🔥 Structure
+# Structure
 Files within in *crypto* project.
 
 | Filename | Description |
