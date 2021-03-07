@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 
 	int opt, mode;
  
-	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s:a;LX")) != -1) {
+	while ((opt = mygetopt(argc, argv, "?vp:h:P:G;C:V:s:a;LXS")) != -1) {
 		switch (opt)
 		{
 			case 'a':
@@ -328,11 +328,8 @@ static int cert_show_details(const char *certPath) {
 
 	if ((cert = wolfSSL_X509_load_certificate_file(certPath, SSL_FILETYPE_PEM)) == NULL)
 		eprintf("Unable to load cert file to memory.\n", cleanup);
-	
-	show_x509_pub_key_info(cert);
 
-
-	//suc = print_cert_details(cert);	
+	suc = print_cert_details(cert);	
 
 cleanup:	
 	XFREE(cert, 0, DYNAMIC_TYPE_X509);
@@ -538,6 +535,7 @@ if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &htmlFinish, &endBlock, sav
 	switch (httpStatus) {
 
 		case HTTP_OK: // Only process finish using the '0'/ html method if receive OK response
+			printf("%s\n", outMsg);
 			fprintf(saveFilePtr, "%s", outMsg); // Put first read
 			while (!htmlFinish) { 
 				DO_READ(); 
@@ -546,8 +544,7 @@ if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &htmlFinish, &endBlock, sav
 			} 
 			break;
 		case HTTP_MOVED_PERM:
-			printf("%s", outMsg);
-
+			if (! g_followRedirect) printf("%s", outMsg);
 			if (endBlock) {
 				goto socket_cleanup;
 			}
@@ -568,7 +565,7 @@ if ((err = client_read(ssl, outMsg, outMsgSz - 1, 1, &htmlFinish, &endBlock, sav
 					}
 				}
 				DO_READ();
-				printf("%s", outMsg);
+				if (!g_followRedirect) printf("%s", outMsg);
 			} while (!endBlock);
 			printf("\n");
 			break;
@@ -781,19 +778,6 @@ static char *craft_redirect_msg(const char *prevUrl, const char *locationUrl) {
 	// Check if url has GET params first, then slice
 
 	build_msg_header("GET", url, params, msg, "");
-
-	//printf("OutMsg:\n%s\n", msg);
-	//size_t i;
-	//for (i = 0; i < sizeof(msg); ++i) {
-	//	printf("%d ", msg[i]);
-	//}
-
-	//char *testing = "GET / HTTP/1.1\r\nHost: www.youtube.com\r\n\r\n";
-	//printf("!-------------------------------!");
-	//for (i = 0; i < sizeof("GET / HTTP/1.1\r\nHost: www.youtube.com\r\n\r\n"); ++i) {
-	//	printf("%d ", testing[i]);
-	//}
-
 
 #undef SKIP_HTTP_HEADERS
 	return msg;

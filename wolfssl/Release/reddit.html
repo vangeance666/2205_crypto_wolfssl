@@ -1,0 +1,145 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+cache-control: private, s-maxage=0, max-age=0, must-revalidate, no-store
+Content-Type: text/html; charset=utf-8
+x-envoy-decorator-operation: reddit-desktop-main-canary-loggedout.reddit-desktop.svc.cluster.local:4444/*
+x-envoy-upstream-service-time: 858
+x-frame-options: SAMEORIGIN
+Accept-Ranges: bytes
+Date: Sun, 07 Mar 2021 03:10:40 GMT
+Via: 1.1 varnish
+Vary: Accept-Encoding, Accept-Encoding
+Set-Cookie: loid=0000000000ar5ablmm.2.1615086639000.Z0FBQUFBQmdSRVF2WHpla2tCUGpQZnJTLVNrU3FjSXJkb3pNcEFDbDZ1eTJHb1JxaFp5Sjh0U0IyRWY5RmFCaG13VHAyRGtSUGtaY1JEMjZxRG13bGwxdmNJZ3VWdXAwX0NHcUZBLTFpRmxzQXBCVXc1S3VESE5jWUdScGdZX09JMGQ3NktTb3V4LVM; path=/; expires=Tue, 07 Mar 2023 03:10:39 GMT; domain=.reddit.com; secure; SameSite=None; Secure
+Set-Cookie: session_tracker=cgjlhqgqnkmgdnkamg.0.1615086639576.Z0FBQUFBQmdSRVF2VzNGOXlxTng2QjlYbWZqZlNUeTZJYTVZQUxGdHNQenVaSkp0TnZ6Y09oS1N5eGhQaE5oSE1tbktPNHhKSU4tZDFOUE8xbHRkNE1uRkxBNmxyZGlIdGtUZ01fM3NER01FWFFKaF85VkYtRkFPOU1Vbmd0bktoai14emRhanNreEo; path=/; domain=.reddit.com; secure; SameSite=None; Secure
+Set-Cookie: token_v2=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTUwOTAxMTksInN1YiI6Ii1WWEloRWdYTGRCa3pqZTQ5cGhubXVfTmxuazgiLCJsb2dnZWRJbiI6ZmFsc2UsInNjb3BlcyI6WyIqIiwiZW1haWwiXX0.V3qGMTfYaE7HqgGh60weGv32EL4o04vIETqIpUC0XXU; Path=/; Domain=reddit.com; Expires=Tue, 07 Mar 2023 03:10:39 GMT; HttpOnly; Secure
+Set-Cookie: csv=1; Max-Age=63072000; Domain=.reddit.com; Path=/; Secure; SameSite=None
+Set-Cookie: edgebucket=S40KJamSLScQ1u7K6q; Domain=reddit.com; Max-Age=63071999; Path=/;  secure
+Strict-Transport-Security: max-age=15552000; includeSubDomains; preload
+Server: snooserv
+transfer-encoding: chunked
+
+9bff
+
+    <!DOCTYPE html>
+    <html lang="en-US">
+      <head>
+        <script>
+    var __SUPPORTS_TIMING_API = typeof performance === 'object' && !!performance.mark && !! performance.measure && !!performance.getEntriesByType;
+    function __perfMark(name) { __SUPPORTS_TIMING_API && performance.mark(name); };
+    var __firstPostLoaded = false;
+    function __markFirstPostVisible() {
+      if (__firstPostLoaded) { return; }
+      __firstPostLoaded = true;
+      __perfMark("first_post_title_image_loaded");
+    }
+    var __firstCommentLoaded = false;
+    function __markFirstCommentVisible() {
+      if (__firstCommentLoaded) { return; }
+      __firstCommentLoaded = true;
+      __perfMark("first_comment_loaded");
+    }
+  </script>
+        <script>__perfMark('head_tag_start');</script>
+        <meta charSet="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="referrer" content="origin-when-cross-origin" />
+        <style>
+  /* http://meyerweb.com/eric/tools/css/reset/
+    v2.0 | 20110126
+    License: none (public domain)
+  */
+
+  html, body, div, span, applet, object, iframe,
+  h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+  a, abbr, acronym, address, big, button, cite, code,
+  del, dfn, em, img, input, ins, kbd, q, s, samp,
+  small, strike, strong, sub, sup, tt, var,
+  b, u, i, center,
+  dl, dt, dd, ol, ul, li,
+  fieldset, form, label, legend,
+  table, caption, tbody, tfoot, thead, tr, th, td,
+  article, aside, canvas, details, embed,
+  figure, figcaption, footer, header, hgroup,
+  menu, nav, output, ruby, section, summary,
+  time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+  }
+
+  /* HTML5 display-role reset for older browsers */
+  article, aside, details, figcaption, figure,
+  footer, header, hgroup, menu, nav, section {
+    display: block;
+  }
+  body {
+    line-height: 1;
+    font-family: BentonSans, sans-serif;
+  }
+  ol, ul {
+    list-style: none;
+  }
+  blockquote, q {
+    quotes: none;
+  }
+  blockquote:before, blockquote:after,
+  q:before, q:after {
+    content: '';
+    content: none;
+  }
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  html, body {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* HTML5 display-role reset for older browsers */
+  article, aside, details, figcaption, figure,
+  footer, header, hgroup, menu, nav, section {
+    display: block;
+  }
+
+  button {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: initial;
+  }
+
+  body {
+    min-height: calc(100vh - 48px);
+    line-height: 1;
+    font-family: IBMPlexSans, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body ::-moz-selection {
+    background-color: #7dbcff99;
+  }
+
+  input, textarea, [contenteditable] {
+    
+  font-family: Noto Sans, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+
+    font-family: inherit;
+  }
+</style>
+        <style data-href=chunkCSS/PostCreation~Reddit~StandalonePostPage~reddit-components-ClassicPost~reddit-components-CompactPost~r~9f82fa34.ce4181682cb249181593.css data-chunk=Reddit key=chunkCSS/PostCreation~Reddit~StandalonePostPage~reddit-components-ClassicPost~reddit-components-CompactPost~r~9f82fa34.ce4181682cb249181593.css>._13svhQIUZqD9PVzFcLwOKT{font-size:12px;font-weight:400;line-height:16px;margin:4px 8px;white-space:nowrap;color:var(--newCommunityTheme-linkText);fill:var(--newCommunityTheme-linkText)}._13svhQIUZqD9PVzFcLwOKT:visited{color:var(--newCommunityTheme-linkTextWithBody);fill:var(--newCommunityTheme-linkTextWithBody)}._13svhQIUZqD9PVzFcLwOKT:hover{text-decoration:underline}
+@keyframes _1tIZttmhLdrIGrB-6VvZcT{0%{opacity:0}to{opacity:1}}._3uK2I0hi3JFTKnMUFHD2Pd,.HQ2VJViRjokXpRbJzPvvc{--infoTextTooltip-overflow-left:0px;font-size:12px;font-weight:500;line-height:16px;padding:3px 9px;position:absolute;border-radius:4px;margin-top:-6px;background:#000;color:#fff;animation:_1tIZttmhLdrIGrB-6VvZcT .5s step-end;z-index:100;white-space:pre-wrap}._3uK2I0hi3JFTKnMUFHD2Pd:after,.HQ2VJViRjokXpRbJzPvvc:after{content:"";position:absolute;top:100%;left:calc(50% - 4px - var(--infoTextTooltip-overflow-left));width:0;height:0;border-top:3px solid #000;border-left:4px solid transparent;border-right:4px solid transparent}._3uK2I0hi3JFTKnMUFHD2Pd{margin-top:6px}._3uK2I0hi3JFTKnMUFHD2Pd:after{border-bottom:3px solid #000;border-top:none;bottom:100%;top:auto}
+._2Gt13AX94UlLxkluAMsZqP{background-position:50%;background-repeat:no-repeat;background-size:contain;position:relative;display:inline-block}
+._1QwShihKKlyRXyQSlqYaWW{height:16px;width:16px;vertical-align:bottom}._2X6EB3ZhEeXCh1eIVA64XM{margin-left:3px}._1jNPl3YUk6zbpLWdjaJT1r{font-size:12px;font-weight:500;line-height:16px;border-radius:2px;display:inline-block;margin-right:5px;overflow:hidden;text-overflow:ellipsis;vertical-align:text-bottom;white-space:pre;word-break:normal;padding:0 4px}._1jNPl3YUk6zbpLWdjaJT1r._39BEcWjOlYi1QGcJil6-yl{padding:0}._2hSecp_zkPm_s5ddV2htoj{font-size:12px;font-weight:500;line-height:16px;border-radius:2px;display:inline-block;margin-right:5px;overflow:hidden;text-overflow:ellipsis;vertical-align:text-bottom;white-space:pre;word-break:normal;margin-left:0;padding:0 4px}._2hSecp_zkPm_s5ddV2htoj._39BEcWjOlYi1QGcJil6-yl{padding:0}._1wzhGvvafQFOWAyA157okr{font-size:12px;font-weight:500;line-height:16px;b

@@ -30,11 +30,12 @@ Files within in *crypto* project.
 -C [path]       CA cert file [path] to verify intermediate cert.
 -V [path]       Intermediate cert file [path] to be verified by CA cert specified.
 -s [path]       File path of where server's response using GET/POST will be saved into.
--a <request header> Additional request header, delimit using '&' E.g. "Connection: close&Content-Length: 0"
+-a [request header] Additional request header, delimit using '&' E.g. "Connection: close&Content-Length: 0"
+
 </pre>
 
 
-# Examples
+# Usage Examples
 
 ## Printing cert details
 `➜ crypto.exe -p "youtube-server.pem"`
@@ -46,11 +47,20 @@ Files within in *crypto* project.
 ### Default (Requests for root path)
 `➜ crypto.exe -h youtube.com -G` 
 
+### Saving response to file
+`➜ crypto.exe -h reddit.com -G -s "reddit-page.html"`
+
+### Follow redirects mode
+`➜ crypto.exe -h reddit.com -G -L`
+
+### Combining with saving response to html so you can view the output!
+`➜ crypto.exe -h reddit.com -G -L -s "reddit-redirected.html"`
+
 ### Parameters usage
 `➜ crypto.exe -h youtube.com/results -G search_query=ihate+school`
 
 ### Sending POST message via SSL
-`➜ crypto.exe -h "www.allforyou.sg/login" -P "Email=test@test.com&Password=pass" -a "content-length: 0"
+`➜ crypto.exe -h "www.allforyou.sg/login" -P "Email=test@test.com&Password=pass" -a "content-length: 0"`
 
 # Output
 ## Help Menu
