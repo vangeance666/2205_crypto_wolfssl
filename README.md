@@ -106,9 +106,11 @@ Connect and print all peer certification details using the callback function.
 
 ## Save HTML output
 Connect to peer and save the HTML output to a file to render it on a browser
+
 <p align="center">
-![Alt text](Screenshots/save.gif "Title")
+  <img src="Screenshots/save.gif">
 </p>
+
 ## Viewing the saved HTML output
 ![Alt text](Screenshots/open%20page.png?raw=true "Title")
 
