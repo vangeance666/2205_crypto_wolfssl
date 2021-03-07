@@ -121,13 +121,11 @@ typedef enum {
 
 
 static char g_request[] = "";
-static int g_printPeerCert = 1;
+static int g_printPeerCert = 0;
 static int g_followRedirect = 0;
 
-static int cert_show_details(const char *certPath);
-static int build_msg_header(const char *iType, const char *iUrl, const char *args, char *outBuffer,const char *header);
+static char *craft_redirect_msg(const char *prevUrl, const char *locationUrl);
 static void print_help();
-static char *craft_redirect_msg(const char *locationUrl);
 
 /* Test Against wiki example to check reliability */
 void test_case_http() {
