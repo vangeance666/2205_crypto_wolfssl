@@ -40,7 +40,7 @@ Files within in *crypto* project.
 -V [path]       Intermediate cert file [path] to be verified by CA cert specified.
 -s [path]       File path of where server's response using GET/POST will be saved into.
 -a [request header] Additional request header, delimit using '&' E.g. "Connection: close&Content-Length: 0"
--S 				Prints peer cert details when connected to them.
+-S 		Prints peer cert details when connected to them.
 -L              Follows redirect until receive HTTP 200 response.
 </pre>
 
