@@ -783,16 +783,16 @@ static char *craft_redirect_msg(const char *prevUrl, const char *locationUrl) {
 	build_msg_header("GET", url, params, msg, "");
 
 	//printf("OutMsg:\n%s\n", msg);
-	size_t i;
-	for (i = 0; i < sizeof(msg); ++i) {
-		printf("%d ", msg[i]);
-	}
+	//size_t i;
+	//for (i = 0; i < sizeof(msg); ++i) {
+	//	printf("%d ", msg[i]);
+	//}
 
-	char *testing = "GET / HTTP/1.1\r\nHost: www.youtube.com\r\n\r\n";
-	printf("!-------------------------------!");
-	for (i = 0; i < sizeof("GET / HTTP/1.1\r\nHost: www.youtube.com\r\n\r\n"); ++i) {
-		printf("%d ", testing[i]);
-	}
+	//char *testing = "GET / HTTP/1.1\r\nHost: www.youtube.com\r\n\r\n";
+	//printf("!-------------------------------!");
+	//for (i = 0; i < sizeof("GET / HTTP/1.1\r\nHost: www.youtube.com\r\n\r\n"); ++i) {
+	//	printf("%d ", testing[i]);
+	//}
 
 
 #undef SKIP_HTTP_HEADERS
