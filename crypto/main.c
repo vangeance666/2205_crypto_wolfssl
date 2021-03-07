@@ -771,8 +771,7 @@ static char *craft_redirect_msg(const char *prevUrl, const char *locationUrl) {
 		for (p = locationUrl; *p; *x++ = *p++);
 		if (paramsStart) for (; *paramsStart; *x++ = *paramsStart++);	
 	}	
-
-
+	
 	printf("========Before build msg, url:%s==========\nparams:%s\n", url, params);
 
 	// Check if url has GET params first, then slice

@@ -53,24 +53,22 @@ main.c(764): warning C4090: '=': different 'const' qualifiers
 main.c(771): warning C4090: '=': different 'const' qualifiers
 main.c(713): warning C4101: 'path': unreferenced local variable
 main.c(713): warning C4101: 'host': unreferenced local variable
-main.c(803): warning C4101: 'sz': unreferenced local variable
-main.c(803): warning C4101: 'h': unreferenced local variable
-main.c(803): warning C4101: 'stop': unreferenced local variable
-main.c(888): warning C4018: '<': signed/unsigned mismatch
-main.c(893): warning C4018: '<': signed/unsigned mismatch
-main.c(901): warning C4018: '<': signed/unsigned mismatch
-main.c(907): warning C4018: '<': signed/unsigned mismatch
+main.c(802): warning C4101: 'sz': unreferenced local variable
+main.c(802): warning C4101: 'h': unreferenced local variable
+main.c(802): warning C4101: 'stop': unreferenced local variable
+main.c(887): warning C4018: '<': signed/unsigned mismatch
+main.c(892): warning C4018: '<': signed/unsigned mismatch
+main.c(900): warning C4018: '<': signed/unsigned mismatch
+main.c(906): warning C4018: '<': signed/unsigned mismatch
+main.c(933): warning C4090: 'function': different 'const' qualifiers
 main.c(934): warning C4090: 'function': different 'const' qualifiers
 main.c(935): warning C4090: 'function': different 'const' qualifiers
-main.c(936): warning C4090: 'function': different 'const' qualifiers
-main.c(847): warning C4101: 'params': unreferenced local variable
+main.c(846): warning C4101: 'params': unreferenced local variable
   Generating code
-c:\users\user\desktop\2205_crypto_wolfssl\crypto\main.c(783): warning C4172: returning address of local variable or temporary: msg
-c:\users\user\desktop\2205_crypto_wolfssl\crypto\main.c(477): warning C4700: uninitialized local variable 'ssl' used
-c:\users\user\desktop\2205_crypto_wolfssl\crypto\main.c(267): warning C4700: uninitialized local variable 'ret' used
-  1103 of 1104 functions (99.9%) were compiled, the rest were copied from previous compilation.
-    3 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+c:\users\user\desktop\2205_crypto_wolfssl\crypto\main.c(782): warning C4172: returning address of local variable or temporary: msg
+  1 of 1104 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\Release\crypto.exe
   crypto.vcxproj -> C:\Users\User\Desktop\2205_crypto_wolfssl\Release\crypto.pdb (Full PDB)

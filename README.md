@@ -46,10 +46,10 @@ Files within in *crypto* project.
 
 ## ❄️ Examples
 ### Printing cert details
-`➜ crypto.exe -p "youtube-server.pem"`
+`➜ crypto.exe -p "./certs/youtube/youtube-root.pem"`
 
 ### Verify cert
-`➜ crypto.exe -v -C "CA-Cert.pem" -V "cert-toverify.pem`
+`➜ crypto -v -C "./certs/youtube/youtube-root.pem" -V "./certs/youtube/youtube-mid.pem"`
 
 ### Sending messages GET/POST via SSL
 #### Default (Requests for root path)
