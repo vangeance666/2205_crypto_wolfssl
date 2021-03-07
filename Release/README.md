@@ -123,7 +123,6 @@ Key functions to look at:
 | requests.h | client_read, client_write |
 
 
-The codes are commented heavily to facilitate understanding of the whole code structure. Check [here](#Structure) to know where to mark! 
-
+The codes are commented heavily to facilitate understanding of the whole code structure. Check [here](#-structure) to know where to mark! 
 
 
