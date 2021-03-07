@@ -51,3 +51,45 @@ Files within in *crypto* project.
 
 ### Sending POST message via SSL
 `➜ crypto.exe -h "www.allforyou.sg/login" -P "Email=test@test.com&Password=pass" -a "content-length: 0"
+
+# Output
+## Help Menu
+![Alt text](Screenshots/Help%20Menu.png?raw=true "Title")
+
+## Printing Certificate Details
+Printing all certificate details including modulus and exponent of pub key based on the certificate file path input.
+
+![Alt text](Screenshots/Printint%20Cert%20Details.png?raw=true "Title")
+
+## Manual verification of certifications
+CA verify -> Intermediate
+
+![Alt text](Screenshots/CA%20verify.png?raw=true "Title")
+
+Intermediate verify -> leaf cert
+
+![Alt text](Screenshots/Intermediate%20verify.png?raw=true "Title")
+
+## Example of Using GET without Redirect Functionality
+![Alt text](Screenshots/GET%20without%20Redirect.png?raw=true "Title")
+
+## Example of Using GET with Redirect Functionality
+As we can see from the above image, without using the redirect functionality, if a webpage has been moved permanently <br/>
+we are unable to follow the redirect. Hence, utilising the '-L' option, we are able to send multiple GET/POST to <br/>
+follow the redirection. <br/>
+
+![Alt text](Screenshots/With%20redirect.png?raw=true "Title")
+
+## Callback Function
+Connect and print all peer certification details using the callback function.
+
+![Alt text](Screenshots/callback%20function.png?raw=true "Title")
+
+## Save HTML output
+Connect to peer and save the HTML output to a file to render it on a browser
+
+![Alt text](Screenshots/save%20html%20output.png?raw=true "Title")
+
+## Viewing the saved HTML output
+![Alt text](Screenshots/open%20page.png?raw=true "Title")
+
