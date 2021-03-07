@@ -112,5 +112,5 @@ Connect to peer and save the HTML output to a file to render it on a browser
 ![Alt text](Screenshots/open%20page.png?raw=true "Title")
 
 # Brief explaination of functionalities
-The codes are commented heavily to facilitate understanding of the whole code structure. Check [here](# Structure) to know where to read. 
+The codes are commented heavily to facilitate understanding of the whole code structure. Check [here](#Structure)to know where to read. 
 
